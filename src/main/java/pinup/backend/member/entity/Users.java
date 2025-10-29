@@ -1,6 +1,5 @@
 package pinup.backend.member.entity;
 
-import com.nimbusds.openid.connect.sdk.claims.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Member {
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,7 +77,7 @@ public class Member {
     public enum LoginType {
         GOOGLE, KAKAO
     }
-    
+
     public enum Gender {
         M, F
     }
