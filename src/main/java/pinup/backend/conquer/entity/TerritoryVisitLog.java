@@ -22,7 +22,6 @@ public class TerritoryVisitLog {
 
     // 2. FK 선언 (양방향 x)
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("territory_id")
     @JoinColumn(
             name = "territory_id",
             nullable = false,
