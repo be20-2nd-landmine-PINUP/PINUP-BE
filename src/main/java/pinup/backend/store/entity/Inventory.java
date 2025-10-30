@@ -1,14 +1,10 @@
 package pinup.backend.store.entity;
 
 import groovy.transform.builder.Builder;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.Store;
 
 import java.time.LocalDateTime;
 
@@ -22,12 +18,12 @@ public class Inventory {
     @EmbeddedId
     private InventoryKey id;
 
-
+    @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     private Store store;
 
     @JoinColumn(name = "user_id", nullable = false)
-    private users users;
+    private Users users;
 
     @Column(name = "earned_at", nullable = false)
     private LocalDateTime earnedAt;
