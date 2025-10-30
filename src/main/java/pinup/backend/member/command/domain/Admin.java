@@ -1,4 +1,4 @@
-package pinup.backend.member.entity;
+package pinup.backend.member.command.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

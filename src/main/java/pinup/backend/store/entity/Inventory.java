@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import pinup.backend.member.command.domain.Users;
 
 import java.time.LocalDateTime;
 

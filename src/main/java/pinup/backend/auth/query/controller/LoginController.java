@@ -1,4 +1,4 @@
-package pinup.backend.auth.controller;
+package pinup.backend.auth.query.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

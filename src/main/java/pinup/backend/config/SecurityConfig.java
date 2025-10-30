@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import pinup.backend.auth.service.CustomOAuth2UserService;
+import pinup.backend.auth.command.service.CustomOAuth2UserService;
 
 @Configuration
 @RequiredArgsConstructor

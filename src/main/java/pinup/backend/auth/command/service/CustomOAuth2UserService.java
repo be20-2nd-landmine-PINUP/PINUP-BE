@@ -1,4 +1,4 @@
-package pinup.backend.auth.service;
+package pinup.backend.auth.command.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,8 +8,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import pinup.backend.member.entity.Users;
-import pinup.backend.member.repository.MemberRepository;
+import pinup.backend.member.command.domain.Users;
+import pinup.backend.member.command.repository.MemberCommandRepository;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final MemberRepository memberRepository;
+    private final MemberCommandRepository memberCommandRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest)
@@ -58,7 +58,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         System.out.println(registrationId.toUpperCase() + " 로그인 사용자: " + email);
 
         // DB에 사용자 없으면 신규 생성
-        memberRepository.findByEmail(email).orElseGet(() -> {
+        memberCommandRepository.findByEmail(email).orElseGet(() -> {
             Users newUser = Users.builder()
                     .loginType("google".equals(registrationId) ? Users.LoginType.GOOGLE : Users.LoginType.KAKAO)
                     .name(name)
@@ -71,7 +71,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .preferredSeason(Users.PreferredSeason.봄)
                     .birthDate(LocalDate.of(2000, 1, 1))
                     .build();
-            return memberRepository.save(newUser);
+            return memberCommandRepository.save(newUser);
         });
 
         // Google / Kakao 관계없이 공통된 필드 구조로 반환
