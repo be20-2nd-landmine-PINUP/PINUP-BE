@@ -23,7 +23,6 @@ public class Territory {
 
     // 2. FK 선언, 단방향
     @ManyToOne(fetch = FetchType.LAZY)                  // ToDo: 일단은 성능 향상을 위해서 LAZY fetch로 선언
-    @MapsId("user_id")
     @JoinColumn(
             name = "user_id",
             nullable = false,
