@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PINUP 홈</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #c3ec52, #0ba29d);
+            color: #333;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 40px;
+            width: 400px;
+        }
+        .container h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        .profile {
+            margin: 20px auto;
+        }
+        .profile img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+        }
+        .info {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .logout-btn {
+            display: inline-block;
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PINUP에 오신 것을 환영합니다 🎉</h1>
+
+        <div class="profile">
+            <img th:src="${user.picture}" alt="프로필 사진">
+        </div>
+
+        <div class="info">
+            <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+            <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
+        </div>
+
+        <a href="/logout" class="logout-btn">로그아웃</a>
+    </div>
+</body>
+</html>

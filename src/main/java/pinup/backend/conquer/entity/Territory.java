@@ -1,11 +1,10 @@
 package pinup.backend.conquer.entity;
 
-import com.hazelcast.internal.metrics.ExcludedMetricTargets;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pinup.backend.member.command.domain.Users;
 
 import java.util.Date;
 
