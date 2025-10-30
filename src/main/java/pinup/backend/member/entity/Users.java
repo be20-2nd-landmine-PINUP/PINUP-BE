@@ -79,7 +79,7 @@ public class Users {
     }
 
     public enum Gender {
-        M, F
+        M, F, U // U는 Unknown > google 로그인시 성별 제공이 안되므로 U로 기본 설정
     }
 
     public enum Status {
