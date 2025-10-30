@@ -45,9 +45,29 @@
             height: 20px;
             margin-right: 10px;
         }
+        .kakao-btn {
+            background-color: #FEE500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .kakao-btn:hover {
+            background-color: #3C1E1E;
+        }
+        .kakao-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
     </style>
 </head>
-    <body>
+<body>
     <div class="login-container">
         <h1>PINUP 로그인</h1>
         <a href="/oauth2/authorization/google">
@@ -56,6 +76,13 @@
                 Google로 로그인
             </button>
         </a>
+
+        <a href="/oauth2/authorization/kakao">
+            <button class="kakao-btn">
+                <img class="kakao-icon" src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png">
+                Kakao로 로그인
+            </button>
+        </a>
     </div>
-    </body>
+</body>
 </html>
