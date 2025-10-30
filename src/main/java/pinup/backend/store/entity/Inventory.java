@@ -1,8 +1,8 @@
 package pinup.backend.store.entity;
 
-import groovy.transform.builder.Builder;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +22,7 @@ public class Inventory {
     @JoinColumn(name = "item_id", nullable = false)
     private Store store;
 
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
 

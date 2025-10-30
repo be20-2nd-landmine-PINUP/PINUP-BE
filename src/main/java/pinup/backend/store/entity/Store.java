@@ -2,7 +2,6 @@ package pinup.backend.store.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pinup.backend.store.enums.StoreItemCategory;
 
 @Entity
 @Getter
@@ -20,8 +19,8 @@ public class Store {
 
     // 행정구역ID = FK(관계있음) 한지역에 아이템 여러개있음
     // @ManyToOne
-    @JoinColumn(name = "reion_code", nullable = true)
-    private region region;
+    //@JoinColumn(name = "reion_code", nullable = true)
+    //private region region;
 
     @Column(nullable = false, length = 50)
     private String name;
@@ -31,10 +30,6 @@ public class Store {
 
     @Column(nullable = false)
     private int price;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private StoreItemCategory category;
 
     @Column(name = "image_url", nullable = false, length = 255)
     private String imageUrl;
