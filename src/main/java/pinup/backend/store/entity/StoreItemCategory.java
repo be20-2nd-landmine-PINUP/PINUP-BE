@@ -1,4 +1,4 @@
-package pinup.backend.store.enums;
+package pinup.backend.store.entity;
 
 import lombok.Getter;
 
