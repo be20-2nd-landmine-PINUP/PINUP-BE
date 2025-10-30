@@ -1,4 +1,4 @@
-package pinup.backend.notice.query.entity;
+package pinup.backend.notice.command.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
