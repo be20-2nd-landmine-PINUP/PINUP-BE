@@ -36,7 +36,7 @@ public class Feed {
     private String imageUrl;
 
     @CreationTimestamp      // 생성 시 자동 기입 예정
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp        // 수정 시 자동 기입 예정
