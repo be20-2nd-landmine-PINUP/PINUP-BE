@@ -17,7 +17,7 @@ public class TerritoryVisitLog {
     // 1. PK ID 선언
     @Id
     @Column(name = "visit_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     // 2. FK 선언 (양방향 x)
