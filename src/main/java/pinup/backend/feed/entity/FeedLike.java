@@ -25,7 +25,7 @@ public class FeedLike {
     private Users userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("feed")
+    @MapsId("feedId")
     @JoinColumn(name = "feed_id", nullable = false)
     private Feed feedId;
 
