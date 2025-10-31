@@ -19,11 +19,11 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
      */
 
     // 유저 전체 아이템 조회
-    List<Inventory> findAllByUsers(Users users);
+    List<Inventory> findAllByUserId(Users users);
 
     // 유저의 장착 중인 아이템 조회
-    List<Inventory> findEquippedByUserId(Long userId);
+    List<Inventory> findByUserIdAndIsEquippedTrue(Users user);
 
     // 유저의 해당 아이템 보유 확인
-    boolean existsByUsersItem(Users users, Store store);
+    boolean existsByUserIdAndStore(Users userId, Store store);
 }

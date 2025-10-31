@@ -2,6 +2,7 @@ package pinup.backend.store.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pinup.backend.conquer.command.domain.entity.Region;
 
 @Entity
 @Getter
@@ -16,9 +17,9 @@ public class Store {
     private int itemId;
 
     //행정구역ID = FK(관계있음) 한지역에 아이템 여러개있음
-    //@ManyToOne
-    //@JoinColumn(name = "region_code", nullable = true)
-    //private Region region;
+    @ManyToOne
+    @JoinColumn(name = "region_code", nullable = true)
+    private Region regionCode;
 
     // 아이템 이름
     @Column(nullable = false, length = 50)

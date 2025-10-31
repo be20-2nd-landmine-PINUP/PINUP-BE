@@ -24,7 +24,7 @@ public class Inventory {
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
-    private Users users;
+    private Users userId;
 
     // 상점 아이템 PFK
     @ManyToOne
@@ -40,10 +40,10 @@ public class Inventory {
     @Column(name = "is_equipped", nullable = false)
     private boolean isEquipped = true;
 
-    public static Inventory create(Users users, Store store) {
+    public static Inventory create(Users user, Store store) {
         return Inventory.builder()
-                .id(new InventoryKey(users.getUserId(), store.getItemId()))
-                .users(users)
+                .id(new InventoryKey(user.getUserId(), store.getItemId()))
+                .userId(user)
                 .store(store)
                 .earnedAt(LocalDateTime.now())
                 .isEquipped(true)

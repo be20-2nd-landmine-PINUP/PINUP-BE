@@ -2,6 +2,7 @@ package pinup.backend.store.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pinup.backend.conquer.command.domain.entity.Region;
 import pinup.backend.store.domain.Store;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
     List<Store> findAllByIsActiveTrue();
 
     //지역 한정 아이템 조회
-    List<Store> findLimitedItemsByRegionCode(int regionCode);
+    List<Store> findByRegionCode(Region regionCode);
 }

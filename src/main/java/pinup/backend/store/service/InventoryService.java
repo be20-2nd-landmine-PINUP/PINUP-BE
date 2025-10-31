@@ -19,17 +19,17 @@ public class InventoryService {
 
     // 유저의 보유 아이템 조회
     public List<Inventory> getUserInventory(Users user) {
-        return inventoryRepository.findAllByUsers(user);
+        return inventoryRepository.findAllByUserId(user);
     }
 
     // 유저의 장착 중인 아이템 목록 조회
-    public List<Inventory> getEquippedItems(Long userId) {
-        return inventoryRepository.findEquippedByUserId(userId);
+    public List<Inventory> getEquippedItems(Users user) {
+        return inventoryRepository.findByUserIdAndIsEquippedTrue(user);
     }
 
     // 이미 보유 중이면 예외 발생
     public void validateOwnedItem(Users user, Store store) {
-        boolean alreadyOwned = inventoryRepository.existsByUsersItem(user, store);
+        boolean alreadyOwned = inventoryRepository.existsByUserIdAndStore(user, store);
         if (alreadyOwned) {
             throw new IllegalStateException("이미 보유 중인 아이템입니다.");
         }
