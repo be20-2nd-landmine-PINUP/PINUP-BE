@@ -1,4 +1,4 @@
-package pinup.backend.conquer.entity;
+package pinup.backend.conquer.command.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
