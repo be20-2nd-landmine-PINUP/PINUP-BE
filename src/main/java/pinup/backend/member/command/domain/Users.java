@@ -18,7 +18,7 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false, length = 10)
