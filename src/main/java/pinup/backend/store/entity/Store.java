@@ -22,15 +22,24 @@ public class Store {
     //@JoinColumn(name = "reion_code", nullable = true)
     //private region region;
 
+    // 아이템 이름
     @Column(nullable = false, length = 50)
     private String name;
 
+    // 아이템 설명
     @Column(nullable = false, length = 100)
     private String description;
 
+    // 아이템 가격
     @Column(nullable = false)
     private int price;
 
+    // 아이템 카테고리 (Enum)
+    @Enumerated
+    @Column(nullable = false, length = 20)
+    private StoreItemCategory category;
+
+    // 아이템 이미지 경로
     @Column(name = "image_url", nullable = false, length = 255)
     private String imageUrl;
 
