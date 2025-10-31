@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.store.entity.Inventory;
+import pinup.backend.store.entity.Store;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     // 유저의 장착 중인 아이템 조회
     List<Inventory> findEquippedByUserId(Long userId);
 
+    // 유저의 해당 아이템 보유 확인
+    boolean existsByUsersItem(Users users, Store store);
 }

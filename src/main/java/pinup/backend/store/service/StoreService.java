@@ -3,6 +3,7 @@ package pinup.backend.store.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.store.entity.Store;
 import pinup.backend.store.repository.StoreRepository;
 
@@ -10,13 +11,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    /*
-     *  상점 관련 비즈니스 로직
-     * - 지역 한정 아이템 조회
-     */
 
     // 판매 중인 아이템 조회(지역코드로 한정판 구분 가능)
     public List<Store> getActiveItems() {
