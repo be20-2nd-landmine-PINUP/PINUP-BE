@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Entity
-@Table(name = "te")
+@Table(name = "territory_visig_log")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,8 +39,4 @@ public class TerritoryVisitLog {
 
     @Column(name = "visited_at", nullable = false)
     private Date visitedAt;
-
-
-
-
 }
