@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지 - PIN-UP</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #333;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mypage-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 40px;
+            width: 420px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .profile {
+            margin: 20px auto;
+        }
+        .profile img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+        }
+        .info p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        .btn {
+            display: inline-block;
+            margin: 15px 10px 0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        .home-btn {
+            font-size: 13.3px;
+            background-color: #4CAF50;
+            color: white;
+        }
+        .home-btn:hover {
+            background-color: #388E3C;
+        }
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #1976D2;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="mypage-container">
+    <h1>내 정보</h1>
+
+    <div class="profile">
+        <img th:src="${user.profileImage != null ? user.profileImage : '/images/default-profile.png'}" alt="프로필 사진">
+    </div>
+
+    <form action="/member/update" method="post" class="info">
+        <input type="hidden" name="email" th:value="${user.email}">
+
+        <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+        <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
+
+        <p><strong>닉네임:</strong>
+            <input type="text" name="nickname" th:value="${user.nickname}" required>
+        </p>
+
+        <p>
+            <strong>생년월일:</strong>
+            <input type="date" name="birthDate" th:value="${user.birthDate}" />
+        </p>
+
+        <p>
+            <strong>성별:</strong>
+            <select name="gender">
+                <option th:each="g : ${genders}"
+                        th:value="${g}"
+                        th:text="${g}"
+                        th:selected="${g == user.gender}">
+                </option>
+            </select>
+        </p>
+
+        <p>
+            <strong>선호 카테고리:</strong>
+            <select name="preferredCategory">
+                <option th:each="c : ${categories}"
+                        th:value="${c}"
+                        th:text="${c}"
+                        th:selected="${c == user.preferredCategory}"></option>
+            </select>
+        </p>
+
+        <p>
+            <strong>선호 계절:</strong>
+            <select name="preferredSeason">
+                <option th:each="s : ${seasons}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${s == user.preferredSeason}"></option>
+            </select>
+        </p>
+
+        <div class="btn-container">
+            <button type="submit" class="btn edit-btn">정보 수정</button>
+        </div>
+    </form>
+
+    <div class="btn-container">
+        <form action="/member/delete" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+            <button type="submit" class="btn delete-btn">회원 탈퇴</button>
+        </form>
+
+        <a href="/" class="btn home-btn">홈으로</a>
+    </div>
+</div>
+
+</body>
+</html>
