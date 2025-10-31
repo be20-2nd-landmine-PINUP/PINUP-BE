@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.entity.Inventory;
-import pinup.backend.store.entity.Store;
+import pinup.backend.store.domain.Inventory;
+import pinup.backend.store.domain.Store;
 import pinup.backend.store.repository.InventoryRepository;
-import pinup.backend.store.repository.StoreRepository;
 
 import java.util.List;
 

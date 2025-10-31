@@ -3,8 +3,8 @@ package pinup.backend.store.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.entity.Inventory;
-import pinup.backend.store.entity.Store;
+import pinup.backend.store.domain.Inventory;
+import pinup.backend.store.domain.Store;
 
 import java.util.List;
 

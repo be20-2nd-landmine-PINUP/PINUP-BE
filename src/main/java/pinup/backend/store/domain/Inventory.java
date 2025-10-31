@@ -1,4 +1,4 @@
-package pinup.backend.store.entity;
+package pinup.backend.store.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,7 +42,7 @@ public class Inventory {
 
     public static Inventory create(Users users, Store store) {
         return Inventory.builder()
-                .id(new InventoryKey(users.getId(), store.getItemId()))
+                .id(new InventoryKey(users.getUserId(), store.getItemId()))
                 .users(users)
                 .store(store)
                 .earnedAt(LocalDateTime.now())

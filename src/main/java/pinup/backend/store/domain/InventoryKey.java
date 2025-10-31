@@ -1,7 +1,6 @@
-package pinup.backend.store.entity;
+package pinup.backend.store.domain;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

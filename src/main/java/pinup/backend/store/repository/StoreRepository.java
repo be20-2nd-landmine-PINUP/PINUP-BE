@@ -2,7 +2,7 @@ package pinup.backend.store.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pinup.backend.store.entity.Store;
+import pinup.backend.store.domain.Store;
 
 import java.util.List;
 
