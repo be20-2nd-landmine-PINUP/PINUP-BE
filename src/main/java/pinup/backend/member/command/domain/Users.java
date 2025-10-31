@@ -18,7 +18,7 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false, length = 10)
@@ -73,6 +73,17 @@ public class Users {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 회원 정보 수정
+    public void updateInfo(
+            String nickname, Gender gender, PreferredCategory preferredCategory, PreferredSeason preferredSeason, LocalDate birthDate) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.preferredCategory = preferredCategory;
+        this.preferredSeason = preferredSeason;
+        this.birthDate = birthDate;
+    }
+
+
     // ENUM 정의
     public enum LoginType {
         GOOGLE, KAKAO
@@ -93,4 +104,9 @@ public class Users {
     public enum PreferredSeason {
         봄, 여름, 가을, 겨울
     }
+
+    // 상태 변경 메서드 추가
+    public void suspend() { this.status = Status.SUSPENDED; }
+    public void activate() { this.status = Status.ACTIVE; }
+    public void delete() { this.status = Status.DELETED; }
 }

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if ("google".equals(registrationId)) {
             email = (String) attributes.get("email");
             name = (String) attributes.get("name");
+            // 프로필 사진 없으면 기본 이미지 가져오기
             picture = (String) attributes.get("picture");
+            if (picture == null || picture.isBlank()) {
+                picture = "/images/default_profile.png"; // 기본 이미지 경로
+            }
         }
         // Kakao 로그인 처리
         else if ("kakao".equals(registrationId)) {
@@ -48,7 +53,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             email = (String) kakaoAccount.get("email");
             name = (String) profile.get("nickname");
+            // 프로필 사진 없으면 기본 이미지 가져오기
             picture = (String) profile.get("profile_image_url");
+            if (picture == null || picture.isBlank()) {
+                picture = "/images/default_profile.png"; // 기본 이미지 경로
+            }
+
         } else {
             picture = null;
             email = null;
@@ -58,7 +68,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         System.out.println(registrationId.toUpperCase() + " 로그인 사용자: " + email);
 
         // DB에 사용자 없으면 신규 생성
-        memberCommandRepository.findByEmail(email).orElseGet(() -> {
+        Optional<Users> existingUser = memberCommandRepository.findByEmail(email);
+        if (existingUser.isEmpty()) {
             Users newUser = Users.builder()
                     .loginType("google".equals(registrationId) ? Users.LoginType.GOOGLE : Users.LoginType.KAKAO)
                     .name(name)
@@ -71,8 +82,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .preferredSeason(Users.PreferredSeason.봄)
                     .birthDate(LocalDate.of(2000, 1, 1))
                     .build();
-            return memberCommandRepository.save(newUser);
-        });
+            memberCommandRepository.save(newUser);
+        }
 
         // Google / Kakao 관계없이 공통된 필드 구조로 반환
         Map<String, Object> unifiedAttributes = new HashMap<>();

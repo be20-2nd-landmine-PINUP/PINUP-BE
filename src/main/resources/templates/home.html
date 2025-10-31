@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PINUP 홈</title>
+    <title>PIN-UP Home</title>
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
@@ -23,9 +23,14 @@
             width: 400px;
         }
         .container h1 {
-            font-size: 26px;
+            font-size: 28px;
             margin-bottom: 20px;
             color: #222;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 5px;
         }
         .profile {
             margin: 20px auto;
@@ -39,23 +44,36 @@
             font-size: 16px;
             margin: 10px 0;
         }
-        .logout-btn {
+        .btn {
             display: inline-block;
-            background-color: #f44336;
-            color: white;
             padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
+            font-weight: bold;
             transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .logout-btn {
+            background-color: #f44336;
+            color: white;
         }
         .logout-btn:hover {
             background-color: #d32f2f;
+        }
+        .mypage-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .mypage-btn:hover {
+            background-color: #388E3C;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PINUP에 오신 것을 환영합니다 🎉</h1>
+        <img th:src="@{/images/pinup_logo.png}" alt="PINUP 로고" class="logo">
+
+        <h1>WELCOME🎉</h1>
 
         <div class="profile">
             <img th:src="${user.picture}" alt="프로필 사진">
@@ -66,7 +84,8 @@
             <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
         </div>
 
-        <a href="/logout" class="logout-btn">로그아웃</a>
+        <a href="/mypage" class="btn mypage-btn">마이페이지</a>
+        <a href="/logout" class="btn logout-btn">로그아웃</a>
     </div>
 </body>
 </html>
