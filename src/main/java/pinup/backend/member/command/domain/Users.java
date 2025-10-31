@@ -83,10 +83,6 @@ public class Users {
         this.birthDate = birthDate;
     }
 
-    // 회원 탈퇴
-    public void delete() {
-        this.status = Status.DELETED;
-    }
 
     // ENUM 정의
     public enum LoginType {
@@ -108,4 +104,9 @@ public class Users {
     public enum PreferredSeason {
         봄, 여름, 가을, 겨울
     }
+
+    // 상태 변경 메서드 추가
+    public void suspend() { this.status = Status.SUSPENDED; }
+    public void activate() { this.status = Status.ACTIVE; }
+    public void delete() { this.status = Status.DELETED; }
 }

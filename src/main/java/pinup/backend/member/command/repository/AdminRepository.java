@@ -5,6 +5,7 @@ import pinup.backend.member.command.domain.Admin;
 
 import java.util.Optional;
 
+//관리자 로그인, 초기 계정 생성
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
     Optional<Admin> findByName(String name);
 }

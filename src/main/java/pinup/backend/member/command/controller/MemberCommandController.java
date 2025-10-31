@@ -12,6 +12,7 @@ import pinup.backend.member.command.service.MemberCommandService;
 
 import java.time.LocalDate;
 
+//회원 정보 수정
 @Controller
 @RequiredArgsConstructor
 public class MemberCommandController {
