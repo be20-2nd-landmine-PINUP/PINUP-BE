@@ -1,4 +1,4 @@
-package pinup.backend.store.entity;
+package pinup.backend.store.domain;
 
 import lombok.Getter;
 

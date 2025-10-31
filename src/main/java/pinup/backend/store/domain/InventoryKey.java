@@ -1,7 +1,7 @@
-package pinup.backend.store.entity;
+package pinup.backend.store.domain;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Embeddable
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode  //(엔티티 동일성 비교)
 public class InventoryKey implements Serializable {
     /**
@@ -18,6 +19,6 @@ public class InventoryKey implements Serializable {
      * - user_id + store_id 조합이 기본키 역할을 함
      */
 
-    private int userId;     //FK to User
-    private int itemId;     //FK to Store
+    private Long userId;     //FK to User
+    private Integer itemId;     //FK to Store
 }
