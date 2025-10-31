@@ -73,6 +73,21 @@ public class Users {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 회원 정보 수정
+    public void updateInfo(
+            String nickname, Gender gender, PreferredCategory preferredCategory, PreferredSeason preferredSeason, LocalDate birthDate) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.preferredCategory = preferredCategory;
+        this.preferredSeason = preferredSeason;
+        this.birthDate = birthDate;
+    }
+
+    // 회원 탈퇴
+    public void delete() {
+        this.status = Status.DELETED;
+    }
+
     // ENUM 정의
     public enum LoginType {
         GOOGLE, KAKAO

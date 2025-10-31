@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>로그인 - PINUP</title>
+    <title>로그인 - PIN-UP</title>
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
@@ -11,78 +11,90 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0;
         }
         .login-container {
             background: white;
             border-radius: 20px;
-            padding: 50px;
+            padding: 50px 40px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
             width: 400px;
         }
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 5px;
+        }
         .login-container h1 {
-            font-size: 28px;
+            font-size: 26px;
             color: #333;
             margin-bottom: 30px;
+        }
+        .google-btn, .kakao-btn {
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            margin-bottom: 15px;
         }
         .google-btn {
             background-color: #4285F4;
             color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.3s;
         }
         .google-btn:hover {
             background-color: #3367D6;
         }
-        .google-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
         .kakao-btn {
             background-color: #FEE500;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.3s;
+            color: #3C1E1E;
         }
         .kakao-btn:hover {
-            background-color: #3C1E1E;
+            background-color: #e6cc00;
         }
-        .kakao-icon {
-            width: 20px;
-            height: 20px;
+        .google-icon, .kakao-icon {
+            width: 22px;
+            height: 22px;
             margin-right: 10px;
+        }
+        .footer-text {
+            font-size: 13px;
+            color: #777;
+            margin-top: 25px;
+        }
+        .footer-text span {
+            color: #333;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>PINUP 로그인</h1>
-        <a href="/oauth2/authorization/google">
-            <button class="google-btn">
-                <img class="google-icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-                Google로 로그인
-            </button>
-        </a>
+<div class="login-container">
+    <img th:src="@{/images/pinup_logo.png}" alt="PINUP 로고" class="logo">
 
-        <a href="/oauth2/authorization/kakao">
-            <button class="kakao-btn">
-                <img class="kakao-icon" src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png">
-                Kakao로 로그인
-            </button>
-        </a>
-    </div>
+    <h1>PIN-UP 로그인</h1>
+
+    <a href="/oauth2/authorization/google" style="text-decoration:none;">
+        <button class="google-btn">
+            <img class="google-icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+            Google로 로그인
+        </button>
+    </a>
+
+    <a href="/oauth2/authorization/kakao" style="text-decoration:none;">
+        <button class="kakao-btn">
+            <img class="kakao-icon" src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" alt="Kakao logo">
+            Kakao로 로그인
+        </button>
+    </a>
+
+    <p class="footer-text">PIN-UP에 처음이신가요? <span>Google 또는 Kakao로 시작하세요.</span></p>
+</div>
 </body>
 </html>
