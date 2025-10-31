@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.io.Serializable;
 
-// TODO : Merge 후 접근자는 확인 요망
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
