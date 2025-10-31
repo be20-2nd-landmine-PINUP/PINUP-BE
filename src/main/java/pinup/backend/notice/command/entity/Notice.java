@@ -8,20 +8,21 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import pinup.backend.member.command.domain.Admin;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Notice {
     @Id
     @Column(name = "notice_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer noticeId;
 
-    /*
-    * Admin entity 클래스 선언 필요함
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "admin_id",
@@ -29,7 +30,6 @@ public class Notice {
         foreignKey = @ForeignKey(name = "fk_notice_admin_id")
     )
     private Admin admin;
-    */
 
     @Column(name = "notice_title")
     private String noticeTitle;
@@ -38,7 +38,7 @@ public class Notice {
     private String noticeContent;
 
     @CreatedDate
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
@@ -48,11 +48,11 @@ public class Notice {
     @Builder
     public Notice(
             String noticeTitle,
-            String noticeContent
-//            Admin admin
+            String noticeContent,
+            Admin admin
     ) {
         this.noticeTitle = noticeTitle;
         this.noticeContent = noticeContent;
-//        this.admin = admin;   Todo: admin 엔티티 추가에 따라 리펙토링 예정
+        this.admin = admin;
     }
 }

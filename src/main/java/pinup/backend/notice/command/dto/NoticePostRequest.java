@@ -1,18 +1,16 @@
-package pinup.backend.notice.query.dto;
+package pinup.backend.notice.command.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class NoticeListResponse {
-    private Integer noticeId;
+public class NoticePostRequest {
+    private Integer adminId;
     private String noticeTitle;
-    private LocalDateTime createdAt;
+    private String noticeContent;
 }
