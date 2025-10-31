@@ -17,10 +17,10 @@ public class Store {
     @Column(name = "item_id")
     private int itemId;
 
-    // 행정구역ID = FK(관계있음) 한지역에 아이템 여러개있음
-    // @ManyToOne
-    //@JoinColumn(name = "reion_code", nullable = true)
-    //private region region;
+    //행정구역ID = FK(관계있음) 한지역에 아이템 여러개있음
+    @ManyToOne
+    @JoinColumn(name = "reion_code", nullable = true)
+    private region region;
 
     // 아이템 이름
     @Column(nullable = false, length = 50)
