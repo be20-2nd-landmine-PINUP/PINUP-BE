@@ -1,4 +1,4 @@
-package pinup.backend.conquer.entity;
+package pinup.backend.conquer.command.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Entity
-@Table(name = "te")
+@Table(name = "territory_visig_log")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class TerritoryVisitLog {
     // 1. PK ID 선언
     @Id
     @Column(name = "visit_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     // 2. FK 선언 (양방향 x)
@@ -39,8 +39,4 @@ public class TerritoryVisitLog {
 
     @Column(name = "visited_at", nullable = false)
     private Date visitedAt;
-
-
-
-
 }
