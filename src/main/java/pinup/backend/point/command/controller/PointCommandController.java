@@ -18,7 +18,7 @@ public class PointCommandController {
         this.service = service;
     }
 
-    // 적립 (피드/영토 등)
+    // 적립 (피드/영토 등), requestbody로 json에서 DTO로 자동 매핑, 혹은 그 역 순으로.
     @PostMapping("/grant")
     public ResponseEntity<Void> grant(@Valid @RequestBody GrantPointRequest req) {
         service.grant(req.userId(), req.pointValue(), req.sourceId(), req.sourceType());

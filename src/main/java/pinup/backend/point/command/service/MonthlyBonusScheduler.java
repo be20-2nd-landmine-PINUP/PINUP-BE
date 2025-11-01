@@ -22,7 +22,7 @@ public class MonthlyBonusScheduler {
         this.pointService = pointService;
     }
 
-    // 매월 1일 00:05 KST
+    // 매월 1일 00:05 KST; 시간 기준 맞춰야함
     @Scheduled(cron = "${point.bonus.cron}", zone = "Asia/Seoul")
     public void grantMonthlyBonus() {
         ZoneId zone = ZoneId.of("Asia/Seoul");
