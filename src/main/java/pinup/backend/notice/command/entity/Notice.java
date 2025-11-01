@@ -45,6 +45,9 @@ public class Notice {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Builder
     public Notice(
             String noticeTitle,
@@ -54,5 +57,10 @@ public class Notice {
         this.noticeTitle = noticeTitle;
         this.noticeContent = noticeContent;
         this.admin = admin;
+    }
+
+    public Integer deleteNotice() {
+        this.isDeleted = true;
+        return getNoticeId();
     }
 }
