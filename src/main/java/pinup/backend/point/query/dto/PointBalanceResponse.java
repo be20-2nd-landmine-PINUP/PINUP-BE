@@ -1,4 +1,4 @@
 package pinup.backend.point.query.dto;
 
-public class PointBalanceResponse {
-}
+
+public record PointBalanceResponse(Long userId, int totalPoint) {}

@@ -20,7 +20,7 @@ public class NoticeCommandService {
     private final AdminRepository adminRepository;
 
     public Integer postNotice(NoticePostRequest request) {
-        Admin admin = adminRepository.findById((request.getAdminId().longValue())).orElseThrow(IllegalArgumentException::new);
+        Admin admin = adminRepository.findById((int) request.getAdminId().longValue()).orElseThrow(IllegalArgumentException::new);
 
         return noticeRepository.save(Notice.builder()
                 .noticeContent(request.getNoticeContent())

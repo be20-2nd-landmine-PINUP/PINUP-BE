@@ -1,4 +1,12 @@
 package pinup.backend.point.query.dto;
 
-public class PointLogResponse {
-}
+import java.time.LocalDateTime;
+
+public record PointLogResponse(
+        Long logId,
+        Long userId,
+        Long pointSourceId,
+        String sourceType,
+        Integer pointValue,
+        LocalDateTime createdAt
+) {}

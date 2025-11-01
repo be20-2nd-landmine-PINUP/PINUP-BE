@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace= "pinup.backend.point.query.mapper.PointQueryMapper">
+
+    <select id="selectTotalPoint" parameterType="long" resultType="int">
+        SELECT total_point
+        FROM total_point
+        WHERE user_id = #{userId}
+    </select>
+
+    <resultMap id="PointLogMap" type="com.example.project.point.query.dto.PointLogResponse">
+        <result column="log_id" property="logId"/>
+        <result column="user_id" property="userId"/>
+        <result column="point_source_id" property="pointSourceId"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="point_value" property="pointValue"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="selectLogsByUser" resultMap="PointLogMap">
+        SELECT log_id, user_id, point_source_id, source_type, point_value, created_at
+        FROM point_log
+        WHERE user_id = #{userId}
+        ORDER BY log_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+</mapper>

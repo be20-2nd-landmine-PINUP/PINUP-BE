@@ -1,8 +1,6 @@
 package pinup.backend.point.command.service;
 
-// point/command/service/PointCommandService.java
-package com.example.project.point.command.service;
-
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.point.command.domain.PointLog;
@@ -24,7 +22,7 @@ public class PointCommandService {
     @Transactional
     public void grant(Long userId, int value, Long sourceId, String sourceType) {
         // 로그
-        pointLogRepository.save(new PointLog(userId, sourceId, SourceType.valueOf(sourceType), value));
+        pointLogRepository.save(new PointLog(userId, sourceId, PointLog.SourceType.valueOf(sourceType), value));
         // 누적 (upsert add)
         totalPointRepository.upsertAdd(userId, value);
     }
@@ -36,6 +34,6 @@ public class PointCommandService {
             throw new IllegalStateException("포인트 부족");
         }
         // 차감 로그는 음수로 기록 (DDL 유지: source_type='STORE')
-        pointLogRepository.save(new PointLog(userId, itemId, SourceType.STORE, -value));
+        pointLogRepository.save(new PointLog(userId, itemId, PointLog.SourceType.STORE, -value));
     }
 }
