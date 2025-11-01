@@ -4,6 +4,8 @@ package pinup.backend.point.command.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pinup.backend.point.command.dto.GrantPointRequest;
+import pinup.backend.point.command.dto.UsePointRequest;
 import pinup.backend.point.command.service.PointCommandService;
 
 @RestController
