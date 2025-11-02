@@ -18,9 +18,9 @@ public class StoreItemResponseDto {
     private String imageUrl;
     private Boolean isActive;
 
-    // 지역 정보
-    // private Integer regionCode;
-    //private String regionName;
+    //지역 정보
+    private Integer regionCode;
+    private String regionName;
 
     // 인벤토리
     private Boolean isEquipped;

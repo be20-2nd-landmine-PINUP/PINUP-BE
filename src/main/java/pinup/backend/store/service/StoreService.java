@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.store.domain.Inventory;
 import pinup.backend.store.domain.Store;
+import pinup.backend.store.domain.StoreItemCategory;
+import pinup.backend.store.domain.StoreLimitType;
 import pinup.backend.store.repository.StoreRepository;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final InventoryService inventoryService;
+    //private final ConquerRepository conquerRepository;
     //private final PointService pointService;
 
     // 판매 중인 아이템 조회(지역코드로 한정판 구분 가능)
@@ -39,6 +42,20 @@ public class StoreService {
 
         // 아이템 보유 중 검증
         inventoryService.validateOwnedItem(user, store);
+
+        /* (region 클래스에 Getter 필요
+        if (store.getLimitType() == StoreLimitType.LIMITED) {
+        Long regionId = store.getRegion().getRegionId();
+
+        // 점령 여부 확인(reion_id 기준)]
+        boolean conquerd = conquerRepository.existsByUserAndRegionId(user, regionId);
+        if (!conquerd) {
+            throw new IllegalStateException("해당 지역을 점령 후 한정판 아이템 구매가능합니다.");
+        }
+    }
+        */
+
+
 
         // "구매 정보" 포인트 서비스로 전달
         /*PointSpendRequest request = PointSpendRequest.builder()

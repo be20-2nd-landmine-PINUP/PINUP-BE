@@ -20,8 +20,8 @@ public class Store {
 
     //행정구역ID = FK(관계있음) 한지역에 아이템 여러개있음
     @ManyToOne
-    @JoinColumn(name = "region_code", nullable = true)
-    private Region regionCode;
+    @JoinColumn(name = "region_id", nullable = true)
+    private Region region;
 
     // 아이템 이름
     @Column(nullable = false, length = 50)
@@ -39,6 +39,11 @@ public class Store {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StoreItemCategory category;
+
+    // 한정판 속성(일반/ 한정판/ 이벤트)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private StoreLimitType limitType;
 
     // 아이템 이미지 URL
     @Column(name = "image_url", nullable = false, length = 255)
