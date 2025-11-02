@@ -18,18 +18,18 @@ public class InventoryService {
    private final InventoryRepository inventoryRepository;
 
     // 유저의 보유 아이템 조회
-    public List<Inventory> getUserInventory(Users user) {
-        return inventoryRepository.findAllByUserId(user);
+    public List<Inventory> getUserInventory(Users userId) {
+        return inventoryRepository.findAllByUserId(userId);
     }
 
     // 유저의 장착 중인 아이템 목록 조회
-    public List<Inventory> getEquippedItems(Users user) {
-        return inventoryRepository.findByUserIdAndIsEquippedTrue(user);
+    public List<Inventory> getEquippedItems(Users userId) {
+        return inventoryRepository.findByUserIdAndIsEquippedTrue(userId);
     }
 
     // 이미 보유 중이면 예외 발생
-    public void validateOwnedItem(Users user, Store store) {
-        boolean alreadyOwned = inventoryRepository.existsByUserIdAndStore(user, store);
+    public void validateOwnedItem(Users userId, Store store) {
+        boolean alreadyOwned = inventoryRepository.existsByUserIdAndStore(userId, store);
         if (alreadyOwned) {
             throw new IllegalStateException("이미 보유 중인 아이템입니다.");
         }
@@ -37,8 +37,8 @@ public class InventoryService {
 
     //인벤토리에 새 아이템 추가
     @Transactional
-    public Inventory addToInventory(Users user, Store store) {
-        Inventory newItem = Inventory.create(user, store);
+    public Inventory addToInventory(Users userId, Store store) {
+        Inventory newItem = Inventory.create(userId, store);
         return inventoryRepository.save(newItem);
     }
 
