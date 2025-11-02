@@ -1,10 +1,12 @@
 package pinup.backend.home.query.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import pinup.backend.member.command.domain.Users;
 
 @Controller
 public class HomeController {
@@ -16,4 +18,5 @@ public class HomeController {
         }
         return "home"; // templates/home.html 렌더링
     }
+
 }
