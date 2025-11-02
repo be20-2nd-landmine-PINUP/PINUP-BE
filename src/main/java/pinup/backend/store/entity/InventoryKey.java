@@ -14,7 +14,7 @@ import java.io.Serializable;
 @EqualsAndHashCode  //(엔티티 동일성 비교)
 public class InventoryKey implements Serializable {
     /**
-     * ✅ Inventory의 복합키(Composite Key)를 정의하는 클래스
+     *  Inventory의 복합키(Composite Key)를 정의하는 클래스
      * - user_id + store_id 조합이 기본키 역할을 함
      */
 
