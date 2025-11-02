@@ -22,6 +22,4 @@ public class Region {
 
     @Column(name = "region_depth3")
     private String regionDepth3;
-
-
 }
