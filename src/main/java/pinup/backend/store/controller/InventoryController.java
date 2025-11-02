@@ -18,10 +18,8 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    //보유 아이템 전체 조회
-
     // 유저 보유 아이템 조회
-    @GetMapping("/inventory")
+    @GetMapping
     public List<Inventory> getUserInventory(@RequestAttribute("user") Users userId) {
         return inventoryService.getUserInventory(userId);
     }

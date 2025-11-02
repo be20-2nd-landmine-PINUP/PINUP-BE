@@ -7,7 +7,9 @@ import pinup.backend.conquer.command.domain.entity.Region;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "store")    //store로 이름 변경시 필요한지 피드백 필요
+@Builder
 public class Store {
 
     // 아이템ID = PK
