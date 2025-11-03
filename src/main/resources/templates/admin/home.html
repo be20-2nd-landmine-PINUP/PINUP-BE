@@ -46,7 +46,7 @@
         .card {
             background-color: #f9f9f9;
             border-radius: 12px;
-            padding: 20px;
+            padding: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
@@ -122,20 +122,20 @@
 
     <div class="dashboard">
         <div class="card">
-            <h2 th:text="${userCount}">0</h2>
             <p>전체 회원 수</p>
+            <h2 th:text="${userCount}">0</h2>
         </div>
         <div class="card">
-            <h2 th:text="${newUsersToday}">0</h2>
             <p>오늘 가입한 회원</p>
+            <h2 th:text="${newUsersToday}">0</h2>
         </div>
         <div class="card">
-            <h2 th:text="${feedCount}">0</h2>
             <p>전체 피드 수</p>
+            <h2 th:text="${feedCount}">0</h2>
         </div>
         <div class="card">
-            <h2 th:text="${reportPending}">0</h2>
             <p>미처리 신고</p>
+            <h2 th:text="${reportPending}">0</h2>
         </div>
     </div>
 

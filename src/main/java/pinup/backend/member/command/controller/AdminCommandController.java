@@ -11,8 +11,8 @@ public class AdminCommandController {
         return "admin/login"; //
     }
 
-    @GetMapping("/admin/home")
-    public String homePage() {
-        return "admin/home";  //
-    }
+//    @GetMapping("/admin/home")
+//    public String homePage() {
+//        return "admin/home";  //
+//    }
 }
