@@ -1,4 +1,4 @@
-package pinup.backend.conquer.entity;
+package pinup.backend.conquer.command.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Date;
 public class Territory {
     // 1. PK ID 선언
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)     // auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)     // auto-increment
     @Column(name = "territory_id", nullable = false)
     private long territoryId;
 
