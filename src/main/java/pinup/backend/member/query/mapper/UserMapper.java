@@ -11,7 +11,7 @@ public interface UserMapper {
 
     @Select("""
         SELECT
-            user_id AS id,
+            user_id AS userId,
             user_name AS name,
             nickname,
             email,
@@ -23,7 +23,7 @@ public interface UserMapper {
 
     @Select("""
         SELECT
-            user_id AS id,
+            user_id AS userId,
             user_name AS name,
             nickname,
             email,
