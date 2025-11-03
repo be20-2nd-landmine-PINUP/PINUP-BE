@@ -1,4 +1,4 @@
-package pinup.backend.feed.command.entity;
+package pinup.backend.feed.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;

@@ -1,4 +1,4 @@
 package pinup.backend.feed.command.dto;
 
-public class FeedCommandDto {
+public class FeedUpdateRequest {
 }
