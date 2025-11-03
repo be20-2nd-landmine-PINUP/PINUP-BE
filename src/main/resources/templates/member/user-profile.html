@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${user.nickname} + '님의 프로필 - PIN-UP'">프로필</title>
+    <style>
+        body {
+            font-family: Pretendard;
+            background: #f5f5f5;
+            padding: 30px;
+        }
+
+        .box {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0ba29d;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #088b87;
+        }
+
+        .btn-block {
+            background: #e74c3c;
+        }
+
+        .btn-block:hover {
+            background: #c0392b;
+        }
+
+        .btn-unblock {
+            background: #95a5a6;
+        }
+
+        .btn-unblock:hover {
+            background: #7f8c8d;
+        }
+
+        form {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.8;
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <h2 th:text="${user.nickname} + '님의 프로필'"></h2>
+    <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+    <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>상태:</strong> <span th:text="${user.status}"></span></p>
+
+    <form th:action="@{'/users/' + ${user.userId} + '/block'}" method="post">
+        <button class="btn btn-block" type="submit">차단하기</button>
+    </form>
+
+    <form th:action="@{'/users/' + ${user.userId} + '/unblock'}" method="post">
+        <button class="btn btn-unblock" type="submit">차단 해제</button>
+    </form>
+
+    <a href="/users" class="btn">← 목록</a>
+</div>
+</body>
+</html>
