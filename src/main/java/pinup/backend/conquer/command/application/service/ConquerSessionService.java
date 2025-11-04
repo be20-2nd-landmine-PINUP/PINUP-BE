@@ -60,7 +60,7 @@ public class ConquerSessionService {
         Instant now = Instant.now();
         Duration elapsed = Duration.between(session.getStartedAt(), now);
 
-        if (elapsed.compareTo(CONQUER_DURATION) < 2L) {
+        if (elapsed.compareTo(CONQUER_DURATION) < 0) {
             return ConquerEndResponse.of("FAILED", "The conquest requires at least 2 hours.");
         }
 
