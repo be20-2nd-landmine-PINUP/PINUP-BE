@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import pinup.backend.feed.command.dto.FeedCreateRequest;
 import pinup.backend.feed.command.dto.FeedUpdateRequest;
 import pinup.backend.feed.command.service.FeedCommandService;
+import pinup.backend.feed.common.response.ApiResponse;
 
 @Tag(name = "Feed Command API", description = "피드 작성/수정/삭제 API")
 @RestController
