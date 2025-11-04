@@ -11,7 +11,7 @@
             region_depth3 as regionDepth3,
             geom as geom
         FROM region
-        WHERE ST_Contains(geom, ST_SRID(Point(#{longitude}, #{latitude}), 4326))
+        WHERE ST_Contains(geom, ST_GeomFromText(CONCAT('POINT(', #{longitude}, ' ', #{latitude}, ')'), 4326))
         ORDER BY
             CASE
                 WHEN region_depth3 IS NOT NULL THEN 3

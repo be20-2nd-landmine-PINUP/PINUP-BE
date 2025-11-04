@@ -1,0 +1,2 @@
+INSERT INTO users (user_id, login_type, user_name, email, nickname, gender, profile_image, status, created_at, updated_at, birth_date, preferred_category, preferred_season) VALUES
+(1, 'GOOGLE', 'Test User', 'test@example.com', 'testuser', 'U', NULL, 'ACTIVE', NOW(), NOW(), '2000-01-01', '자연', '봄');
