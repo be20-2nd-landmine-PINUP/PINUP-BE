@@ -26,6 +26,6 @@ public class Region {
     @Column(name = "region_depth3")
     private String regionDepth3;
 
-    @Column(name = "geom", columnDefinition = "GEOMETRY")
+    @Column(name = "geom", columnDefinition = "GEOMETRY", nullable = false)
     private Geometry geom;
 }

@@ -1,6 +1,7 @@
 package pinup.backend.conquer.command.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ class ConquerControllerTest {
     private ConquerService conquerService;
 
     @Test
+    @DisplayName("점령 테스트 성공")
     @WithMockUser // Simulates an authenticated user
     void conquerRegion_Success() throws Exception {
         // Given
@@ -63,12 +65,14 @@ class ConquerControllerTest {
                         .with(csrf()) // Include CSRF token for POST requests if Spring Security is configured
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                // HTTP 기대 응답 코드 matching
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Successfully conquered 서울특별시!"))
                 .andExpect(jsonPath("$.regionName").value("서울특별시"));
     }
 
     @Test
+    @DisplayName("중복 점령 테스트 통과 - 이미 점령한 영역은 다시 정복하지 못합니다")
     @WithMockUser
     void conquerRegion_AlreadyConquered() throws Exception {
         // Given
@@ -85,11 +89,13 @@ class ConquerControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                // HTTP 기대 응답 코드 matching
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("You have already conquered this region."));
     }
 
     @Test
+    @DisplayName("점령지를 찾지 못했습니다. 존재하지 않는 점령지입니다.")
     @WithMockUser
     void conquerRegion_NotFound() throws Exception {
         // Given
