@@ -1,6 +1,5 @@
 package pinup.backend.point.command.service;
 
-import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Service;
@@ -106,6 +105,28 @@ public class PointCommandService {
             releaseLock(lockKey);
         }
     }
+
+    // 보너스 전용 메서드
+    //monthlyKey는 YYYYMM(예: 202510) 그대로 point_log.point_source_id에 들어갑니다.
+    @Transactional
+    public void grantMonthlyBonus(Long userId, long monthlyKey) {
+        // 멱등: (userId, CAPTURE, YYYYMM)
+        if (exists(userId, PointLog.SourceType.CAPTURE, monthlyKey)) return;
+
+        String lockKey = buildLockKey(userId, PointLog.SourceType.CAPTURE, monthlyKey);
+        if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
+
+        try {
+            if (exists(userId, PointLog.SourceType.CAPTURE, monthlyKey)) return;
+
+            int value = 10; // 보너스 고정 +10
+            pointLogRepository.save(new PointLog(userId, monthlyKey, PointLog.SourceType.CAPTURE, value));
+            totalPointRepository.upsertAdd(userId, value);
+        } finally {
+            releaseLock(lockKey);
+        }
+    }
+
 
     /* ============================================
        공통 유틸
