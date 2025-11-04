@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true) // 조회 전용; 트랜젝션 오버헤드 최소화
 public class RankingQueryService {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -26,6 +26,9 @@ public class RankingQueryService {
     /**
      * ✅ 상위 100위 캐시 조회 (없으면 DB에서 조회 후 캐시 저장)
      * 캐시 유효시간: CacheConfig.java 에서 설정 (기본 1분)
+     결과는 CacheConfig.java 설정에 따라 1분간 유지 (expireAfterWrite(1분)).
+
+     이후 1분 동안은 DB를 다시 조회하지 않고 메모리 캐시에서 응답
      */
     @Cacheable(cacheNames = "rankingTop100", key = "#ym")
     public List<TopRankResponse> getTop100(String ym) {
@@ -49,6 +52,7 @@ public class RankingQueryService {
 
     /**
      * ✅ 특정 연월 캐시 무효화 (Command 서비스에서 집계 완료 후 호출)
+     * @CacheEvict : 지정된 키(ym)에 해당하는 캐시를 삭제.
      */
     @CacheEvict(cacheNames = "rankingTop100", key = "#ym")
     public void evictTop100Cache(String ym) {
@@ -57,6 +61,7 @@ public class RankingQueryService {
 
     /**
      * ✅ 내 순위 조회 (캐시 사용 X)
+     * 개인 데이터(getMyRank)는 캐시 제외 : 최신 데이터 유지, 보안 고려.
      */
     public MyRankResponse getMyRank(String ym, long userId) {
         String sql = """
@@ -96,3 +101,12 @@ public class RankingQueryService {
         return r;
     }
 }
+/*
+목적: “월간 랭킹 데이터를 캐싱하며 빠르게 조회”하는 역할을 하고,
+“내 순위 조회는 항상 최신값을 DB에서 가져오는 구조”
+
+JSON 응답 예시
+{ "rank": 12, "completedCount": 35 }
+{ "rank": 150, "completedCount": 20, "message": "순위권 밖에 있습니다." }
+{ "completedCount": 0, "message": "해당 월 점령 완료 기록이 없습니다." }
+ */
