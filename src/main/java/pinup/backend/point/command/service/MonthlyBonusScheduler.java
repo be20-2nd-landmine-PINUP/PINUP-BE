@@ -26,10 +26,8 @@ public class MonthlyBonusScheduler {
     @Scheduled(cron = "${point.bonus.cron}", zone = "Asia/Seoul")
     public void grantMonthlyBonus() {
         ZoneId zone = ZoneId.of("Asia/Seoul");
-        LocalDate firstDayThisMonth = LocalDate.now(zone).withDayOfMonth(1);
-        LocalDate firstDayPrevMonth = firstDayThisMonth.minusMonths(1);
-        var from = firstDayPrevMonth.atStartOfDay();
-        var to = firstDayThisMonth.atStartOfDay();
+        YearMonth targetYm = YearMonth.now(zone).minusMonths(1);
+        long monthlyKey = targetYm.getYear() * 100L + targetYm.getMonthValue(); // 예: 202510
 
         int offset = 0;
         while (true) {
@@ -46,15 +44,32 @@ public class MonthlyBonusScheduler {
                  ) <= 100
                  ORDER BY t.user_id
                  LIMIT ? OFFSET ?
-            """, (rs, i) -> rs.getLong(1), from, to, batchSize, offset);
+            """, (rs, i) -> rs.getLong(1),
+                    targetYm.atDay(1).atStartOfDay(),
+                    targetYm.plusMonths(1).atDay(1).atStartOfDay(),
+                    batchSize, offset);
 
             if (userIds.isEmpty()) break;
 
             for (Long userId : userIds) {
-                // DDL 유지: 보너스는 source_type='CAPTURE' & source_id=0 으로 기록
-                pointService.grant(userId, 10, 0L, "CAPTURE");
+                // DDL 유지: 보너스는 source_type='CAPTURE'그대로 & source_id=0 으로 기록
+                pointService.grant(userId, 10, monthlyKey, "CAPTURE");
             }
             offset += userIds.size();
         }
     }
 }
+/*
+* source_type='CAPTURE' & source_id=0 고정으로 재 실행시 중복 적립 위험이 있어,
+* source_id에 월 키(YYYYMM)를 넣는 것만으로 멱등
+== 즉, 이렇게 하면 같은 달에 스케줄러가 몇 번 돌더라도 (userId, CAPTURE, YYYYMM) 조합이 이미 있으므로 선조회 단계에서 바로 스킵됩니다.
+
+* 멱등 처리:
+
+(userId, sourceType, sourceId)로 선조회 → named lock(GET_LOCK) → 재확인 → 처리 패턴이면, DDL 변경 없이 동시요청까지 안전하게 막습니다.
+
+보너스 스케줄러 중복 방지:
+
+sourceId = YYYYMM 같은 월 키로 기록하면, 같은 달에 재실행돼도 선조회에서 스킵되어 중복 적립이 안 됩니다.
+
+ */
