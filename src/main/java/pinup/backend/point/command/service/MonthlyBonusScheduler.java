@@ -29,6 +29,9 @@ public class MonthlyBonusScheduler {
         YearMonth targetYm = YearMonth.now(zone).minusMonths(1);
         long monthlyKey = targetYm.getYear() * 100L + targetYm.getMonthValue(); // 예: 202510
 
+        var from = targetYm.atDay(1).atStartOfDay();
+        var to   = targetYm.plusMonths(1).atDay(1).atStartOfDay();
+
         int offset = 0;
         while (true) {
             // 전월 유효 방문 수 ≤ 100인 territory 소유자 user_id 목록 페이징 조회
@@ -45,21 +48,22 @@ public class MonthlyBonusScheduler {
                  ORDER BY t.user_id
                  LIMIT ? OFFSET ?
             """, (rs, i) -> rs.getLong(1),
-                    targetYm.atDay(1).atStartOfDay(),
-                    targetYm.plusMonths(1).atDay(1).atStartOfDay(),
-                    batchSize, offset);
+                    from, to, batchSize, offset);
 
             if (userIds.isEmpty()) break;
 
             for (Long userId : userIds) {
-                // DDL 유지: 보너스는 source_type='CAPTURE'그대로 & source_id=0 으로 기록
-                pointService.grant(userId, 10, monthlyKey, "CAPTURE");
+                // 보너스는 CAPTURE 타입 + source_id=YYYYMM (멱등 키)
+                pointService.grantMonthlyBonus(userId, monthlyKey);
             }
             offset += userIds.size();
         }
     }
 }
 /*
+
+
+
 * source_type='CAPTURE' & source_id=0 고정으로 재 실행시 중복 적립 위험이 있어,
 * source_id에 월 키(YYYYMM)를 넣는 것만으로 멱등
 == 즉, 이렇게 하면 같은 달에 스케줄러가 몇 번 돌더라도 (userId, CAPTURE, YYYYMM) 조합이 이미 있으므로 선조회 단계에서 바로 스킵됩니다.
