@@ -1,4 +1,4 @@
-package pinup.backend.feed.entity;
+package pinup.backend.feed.command.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -11,6 +11,6 @@ import java.io.Serializable;
 @Embeddable
 @EqualsAndHashCode
 public class FeedLikeId implements Serializable {
-    private String userId;
-    private String feedId;
+    private Long userId;
+    private Long feedId;
 }
