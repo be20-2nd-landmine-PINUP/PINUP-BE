@@ -1,9 +1,12 @@
 package pinup.backend.conquer.command.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import org.locationtech.jts.geom.Geometry;
 
 @Entity
 @Table(name = "region")
+@Getter
 public class Region {
 
     @Id
@@ -22,4 +25,7 @@ public class Region {
 
     @Column(name = "region_depth3")
     private String regionDepth3;
+
+    @Column(name = "geom", columnDefinition = "GEOMETRY", nullable = false)
+    private Geometry geom;
 }

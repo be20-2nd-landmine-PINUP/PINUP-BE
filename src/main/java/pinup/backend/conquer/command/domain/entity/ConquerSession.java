@@ -5,18 +5,18 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name="capture_session")
+@Table(name="conquer_session")
 @Getter @Setter @NoArgsConstructor
-public class CaptureSession {
+public class ConquerSession {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="session_id") private Long id;
 
-    @Column(name="user_id", nullable=false)
-    private Integer userId;
+    @Column(name="user_id", nullable=false) // Changed to Long
+    private Long userId;
 
-    @Column(name="region_id", nullable=false)
-    private Integer regionId;   // ← region_id
+    @Column(name="region_id", nullable=false) // Changed to Long
+    private Long regionId;
 
     @Column(name="started_at", nullable=false)
     private Instant startedAt;

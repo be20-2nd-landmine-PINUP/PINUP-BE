@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pinup.backend.conquer.query.mapper.RegionMapper">
+
+    <select id="findRegion" resultType="pinup.backend.conquer.command.domain.entity.Region">
+        SELECT
+            region_id as regionId,
+            region_name as regionName,
+            region_depth1 as regionDepth1,
+            region_depth2 as regionDepth2,
+            region_depth3 as regionDepth3,
+            geom as geom
+        FROM region
+        WHERE ST_Contains(geom, ST_GeomFromText(CONCAT('POINT(', #{longitude}, ' ', #{latitude}, ')'), 4326))
+        ORDER BY
+            CASE
+                WHEN region_depth3 IS NOT NULL THEN 3
+                WHEN region_depth2 IS NOT NULL THEN 2
+                WHEN region_depth1 IS NOT NULL THEN 1
+                ELSE 0
+            END DESC
+        LIMIT 1
+    </select>
+
+    <select id="findById" resultType="pinup.backend.conquer.command.domain.entity.Region">
+        SELECT
+            region_id as regionId,
+            region_name as regionName,
+            region_depth1 as regionDepth1,
+            region_depth2 as regionDepth2,
+            region_depth3 as regionDepth3,
+            geom as geom
+        FROM region
+        WHERE region_id = #{regionId}
+    </select>
+
+</mapper>

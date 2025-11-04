@@ -53,6 +53,12 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // KHS: Added dependencies here
+    // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+    implementation 'org.hibernate.orm:hibernate-spatial:6.2.2.Final'
 }
 
 tasks.named('test') {
