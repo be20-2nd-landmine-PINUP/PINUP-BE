@@ -18,11 +18,11 @@ public class ReportService {
         List<Report> reports = reportRepository.findAll();
 
         return reports.stream().map(report -> ReportListResponse.builder()
-                .report_id(report.getReportId())
-                .user_id(report.getUser().getId().intValue())
+                .reportId(report.getReportId())
+                .userId(report.getUser().getUserId().intValue())
                 .reason(report.getReason())
                 .status(report.getStatus().toString())
-                .created_at(report.getCreatedAt())
+                .createdAt(report.getCreatedAt())
                 .build()).toList();
     }
 
@@ -30,14 +30,14 @@ public class ReportService {
         Report report = reportRepository.findByReportId(reportId);
 
         return ReportSpecificResponse.builder()
-                .report_id(report.getReportId())
-                .user_id(report.getUser().getId().intValue())
+                .reportId(report.getReportId())
+                .userId(report.getUser().getUserId().intValue())
                 .reason(report.getReason())
                 .status(report.getStatus().toString())
-                .created_at(report.getCreatedAt())
-                .admin_id(report.getAdmin().getId())
-                .updated_at(report.getUpdatedAt())
-                .created_at(report.getCreatedAt())
+                .createdAt(report.getCreatedAt())
+                .adminId(report.getAdmin().getId())
+                .updatedAt(report.getUpdatedAt())
+                .createdAt(report.getCreatedAt())
                 .build();
     }
 }

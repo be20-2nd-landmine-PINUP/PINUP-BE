@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReportListResponse {
-    public Integer report_id;
-    public Integer user_id;
+    public Integer reportId;
+    public Integer userId;
     public String reason;
     public String status;
-    public LocalDateTime created_at;
+    public LocalDateTime createdAt;
 }
