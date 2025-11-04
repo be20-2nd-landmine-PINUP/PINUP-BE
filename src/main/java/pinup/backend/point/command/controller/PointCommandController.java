@@ -24,7 +24,11 @@ public class PointCommandController {
     @PreAuthorize("hasAnyRole('FEED', 'CAPTURE')")
     @PostMapping("/grant")
     public ResponseEntity<Void> grant(@Valid @RequestBody GrantPointRequest req) {
-        service.grant(req.userId(), req.pointValue(), req.sourceId(), req.sourceType());
+        switch (req.sourceType()) {
+            case "LIKE" -> service.grantLike(req.userId(), req.sourceId());
+            case "CAPTURE" -> service.grantCapture(req.userId(), req.sourceId());
+            default -> throw new IllegalArgumentException("지원하지 않는 sourceType: " + req.sourceType());
+        }
         return ResponseEntity.noContent().build();
     }
 
