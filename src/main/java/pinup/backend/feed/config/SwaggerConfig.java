@@ -17,6 +17,6 @@ public class SwaggerConfig {
         return new Info()
                 .title("Pinup Feed API")
                 .description("Feed측 Swagger")
-                .version("v1.0.0");
+                .version("v1.0.1");
     }
 }
