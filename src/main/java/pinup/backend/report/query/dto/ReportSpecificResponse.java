@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReportSpecificResponse {
-    public Integer report_id;
-    public Integer user_id;
-    public Integer feed_id;
-    public Integer admin_id;
+    public Integer reportId;
+    public Integer userId;
+    public Integer feedId;
+    public Integer adminId;
     public String reason;
     public String status;
-    public LocalDateTime created_at;
-    public LocalDateTime updated_at;
+    public LocalDateTime createdAt;
+    public LocalDateTime updatedAt;
 }
