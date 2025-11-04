@@ -1,13 +1,13 @@
-package pinup.backend.store.controller;
+package pinup.backend.store.command.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.domain.Inventory;
-import pinup.backend.store.domain.Store;
-import pinup.backend.store.dto.StoreItemResponseDto;
-import pinup.backend.store.service.InventoryService;
-import pinup.backend.store.service.StoreService;
+import pinup.backend.store.command.domain.Inventory;
+import pinup.backend.store.command.domain.Store;
+import pinup.backend.store.command.dto.StoreDetailResponseDto;
+import pinup.backend.store.command.service.InventoryService;
+import pinup.backend.store.command.service.StoreService;
 
 import java.util.List;
 
@@ -20,20 +20,20 @@ public class StoreController {
     private final InventoryService inventoryService;
 
 
-    // 전체 판매중 아이템 조회(지역 한정판 포함)
+    // 전체 판매중 아이템 조회(일반/한정판 포함)
     @GetMapping("/items")
-    public List<StoreItemResponseDto> getActiveItems() {
+    public List<StoreDetailResponseDto> getActiveItems() {
         List<Store> items = storeService.getActiveItems();
         return items.stream()
-                .map(StoreItemResponseDto::fromEntity)
+                .map(StoreDetailResponseDto::fromEntity)
                 .toList();
     }
 
-    // 단일 아이템 상세 조회
+    // 단일 아이템 상세 조회(일반/한정판 포함)
     @GetMapping("/items/{itemId}")
-    public StoreItemResponseDto getItemDetail(@PathVariable Integer itemId) {
+    public StoreDetailResponseDto getItemDetail(@PathVariable Integer itemId) {
         Store item = storeService.getItemById(itemId);
-        return StoreItemResponseDto.fromEntity(item);
+        return StoreDetailResponseDto.fromEntity(item);
     }
 
     // 아이템 구매(인벤토리에 자동 추가)

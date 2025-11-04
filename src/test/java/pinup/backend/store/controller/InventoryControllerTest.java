@@ -11,11 +11,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.domain.Inventory;
-import pinup.backend.store.domain.InventoryKey;
-import pinup.backend.store.domain.Store;
-import pinup.backend.store.domain.StoreItemCategory;
-import pinup.backend.store.service.InventoryService;
+import pinup.backend.store.command.controller.InventoryController;
+import pinup.backend.store.command.domain.Inventory;
+import pinup.backend.store.command.domain.InventoryKey;
+import pinup.backend.store.command.domain.Store;
+import pinup.backend.store.command.domain.StoreItemCategory;
+import pinup.backend.store.command.service.InventoryService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,14 +53,14 @@ public class InventoryControllerTest {
                 .name("테스트 배경")
                 .description("테스트용 배경 아이템")
                 .price(100)
-                .category(StoreItemCategory.BACKGROUND)
+                .category(StoreItemCategory.BUILDING)
                 .imageUrl("test.png")
                 .isActive(true)
                 .build();
 
         testInventory = Inventory.builder()
                 .id(new InventoryKey(1L, 1))
-                .userId(testUser)
+                .users(testUser)
                 .store(testStore)
                 .earnedAt(LocalDateTime.now())
                 .isEquipped(true)

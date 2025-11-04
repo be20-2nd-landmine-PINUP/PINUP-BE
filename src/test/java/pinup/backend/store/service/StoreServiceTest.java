@@ -7,9 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.domain.Store;
-import pinup.backend.store.domain.StoreItemCategory;
-import pinup.backend.store.repository.StoreRepository;
+import pinup.backend.store.command.domain.Store;
+import pinup.backend.store.command.domain.StoreItemCategory;
+import pinup.backend.store.command.repository.StoreRepository;
+import pinup.backend.store.command.service.InventoryService;
+import pinup.backend.store.command.service.StoreService;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +42,7 @@ public class StoreServiceTest {
                 .name("한정판 배경")
                 .description("서울 지역 한정판 아이템")
                 .price(100)
-                .category(StoreItemCategory.BACKGROUND)
+                .category(StoreItemCategory.BUILDING)
                 .imageUrl("image.png")
                 .isActive(true)
                 .build();

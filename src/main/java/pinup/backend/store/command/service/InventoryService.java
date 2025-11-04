@@ -1,12 +1,12 @@
-package pinup.backend.store.service;
+package pinup.backend.store.command.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.domain.Inventory;
-import pinup.backend.store.domain.Store;
-import pinup.backend.store.repository.InventoryRepository;
+import pinup.backend.store.command.domain.Inventory;
+import pinup.backend.store.command.domain.Store;
+import pinup.backend.store.command.repository.InventoryRepository;
 
 import java.util.List;
 
@@ -23,13 +23,13 @@ public class InventoryService {
     }
 
     // 유저의 장착 중인 아이템 목록 조회
-    public List<Inventory> getEquippedItems(Long userId) {
-        return inventoryRepository.findEquippedByUserId(userId);
+    public List<Inventory> getEquippedItems(Long users) {
+        return inventoryRepository.findByUsers_UserIdAndIsEquippedTrue(users);
     }
 
-    // 이미 보유 중이면 예외 발생
+    // 아이템 보유 중이면 예외 발생
     public void validateOwnedItem(Users user, Store store) {
-        boolean alreadyOwned = inventoryRepository.existsByUsersItem(user, store);
+        boolean alreadyOwned = inventoryRepository.existsByUsersAndStore(user, store);
         if (alreadyOwned) {
             throw new IllegalStateException("이미 보유 중인 아이템입니다.");
         }

@@ -9,11 +9,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.domain.Inventory;
-import pinup.backend.store.domain.Store;
-import pinup.backend.store.domain.StoreItemCategory;
-import pinup.backend.store.service.InventoryService;
-import pinup.backend.store.service.StoreService;
+import pinup.backend.store.command.controller.StoreController;
+import pinup.backend.store.command.domain.Inventory;
+import pinup.backend.store.command.domain.Store;
+import pinup.backend.store.command.domain.StoreItemCategory;
+import pinup.backend.store.command.service.InventoryService;
+import pinup.backend.store.command.service.StoreService;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class StoreControllerTest {
                 .name("테스트 배경")
                 .description("테스트용 배경 아이템")
                 .price(100)
-                .category(StoreItemCategory.BACKGROUND) // ENUM 사용
+                .category(StoreItemCategory.BUILDING) // ENUM 사용
                 .imageUrl("test.png")
                 .isActive(true)
                 .build();

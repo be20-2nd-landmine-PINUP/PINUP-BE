@@ -1,4 +1,4 @@
-package pinup.backend.store.domain;
+package pinup.backend.store.command.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,10 +40,11 @@ public class Inventory {
     @Column(name = "is_equipped", nullable = false)
     private boolean isEquipped = true;
 
-    public static Inventory create(Users users, Store store) {
+    // 인벤토리 생성 메서드
+    public static Inventory create(Users userId, Store store) {
         return Inventory.builder()
-                .id(new InventoryKey(users.getUserId(), store.getItemId()))
-                .users(users)
+                .id(new InventoryKey(userId.getUserId(), store.getItemId()))
+                .users(userId)
                 .store(store)
                 .earnedAt(LocalDateTime.now())
                 .isEquipped(true)
