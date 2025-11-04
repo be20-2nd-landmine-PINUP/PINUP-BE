@@ -13,101 +13,122 @@ import java.sql.PreparedStatement;
 
 // 포인트 적립, 차감하는 기능; 쓰기 전용
 // 중복 체크 -> named lock ->재확인 -> 처리
+
 @Service
 public class PointCommandService {
-    // final은 이 서비스는 이 2개의 리포지토리가 필요하다는 의미.
-    // 생성장에 리포를 주입한다.
+
     private final PointLogRepository pointLogRepository;
     private final TotalPointRepository totalPointRepository;
-    private final JdbcTemplate jdbc; // named lock 용
-
+    private final JdbcTemplate jdbc;
 
     public PointCommandService(PointLogRepository pointLogRepository,
                                TotalPointRepository totalPointRepository,
-                               JdbcTemplate jdbcTemplate) {
+                               JdbcTemplate jdbc) {
         this.pointLogRepository = pointLogRepository;
         this.totalPointRepository = totalPointRepository;
-        this.jdbc = jdbcTemplate;
+        this.jdbc = jdbc;
     }
-    // 포인트 적립; 좋아요, 점령, 보너스 + 내역 기록
-    // 로그 저장과 포인트 합산은 하나의 논리적 작업. 둘 다 성공해야 커밋
+
+    /* ============================================
+       좋아요 (+5)
+       ============================================ */
     @Transactional
-    public void grant(Long userId, int value, Long sourceId, String sourceType) {
-        PointLog.SourceType st = PointLog.SourceType.valueOf(sourceType);
+    public void grantLike(Long userId, Long feedId) {
+        if (exists(userId, PointLog.SourceType.LIKE, feedId)) return;  // 이미 있으면 중복 방지
 
-        // 1) 빠른 중복 선조회 (락 없이)
-        if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, sourceId)) return;
-
-        String lockKey = buildLockKey(userId, st, sourceId);
-        boolean locked = acquireNamedLock(lockKey, 5); // 5초 대기
-        if (!locked) {
-            // 잠금 못 잡았으면 안전하게 재시도 유도 or 그냥 멱등 간주하고 종료 선택 가능
-            // 여기선 '한 번 더 확인 후 종료'로 처리
-            if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, sourceId)) return;
-            throw new IllegalStateException("잠금 획득 실패");
-        }
+        String lockKey = buildLockKey(userId, PointLog.SourceType.LIKE, feedId);
+        if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            // 2) 잠금 이후 재확인 (double-check)
-            if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, sourceId)) return;
+            if (exists(userId, PointLog.SourceType.LIKE, feedId)) return;
 
-            // 3) 처리(레저 먼저 → 잔액)
-            pointLogRepository.save(new PointLog(userId, sourceId, st, value));
+            int value = 5; // 좋아요는 무조건 5점
+            pointLogRepository.save(new PointLog(userId, feedId, PointLog.SourceType.LIKE, value));
             totalPointRepository.upsertAdd(userId, value);
         } finally {
-            releaseNamedLock(lockKey);
+            releaseLock(lockKey);
         }
     }
 
+    /* ============================================
+       점령 (region_depth3 기준)
+       ============================================ */
     @Transactional
-    public void use(Long userId, int value, Long itemOrOrderId) {
-        // STORE: 동일 주문/결제 단위로 멱등 보장하려면 sourceId를 주문ID로 쓰는 것을 권장
-        PointLog.SourceType st = PointLog.SourceType.STORE;
+    public void grantCapture(Long userId, Long territoryId) {
+        if (exists(userId, PointLog.SourceType.CAPTURE, territoryId)) return; // 멱등
 
-        if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, itemOrOrderId)) return;
-
-        String lockKey = buildLockKey(userId, st, itemOrOrderId);
-        boolean locked = acquireNamedLock(lockKey, 5);
-        if (!locked) {
-            if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, itemOrOrderId)) return;
-            throw new IllegalStateException("잠금 획득 실패");
-        }
+        String lockKey = buildLockKey(userId, PointLog.SourceType.CAPTURE, territoryId);
+        if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            if (pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, st, itemOrOrderId)) return;
+            if (exists(userId, PointLog.SourceType.CAPTURE, territoryId)) return;
+            // 영토의 행정구역 이름(region_depth3)을 db에서 가져옴
+            String depth3 = jdbc.queryForObject(
+                    "SELECT region_depth3 FROM territory WHERE territory_id = ?",
+                    String.class, territoryId
+            );
+            int value = calcCapturePoint(depth3); // 점수 계산
+
+            pointLogRepository.save(new PointLog(userId, territoryId, PointLog.SourceType.CAPTURE, value));
+            totalPointRepository.upsertAdd(userId, value);
+        } finally {
+            releaseLock(lockKey);
+        }
+    }
+    // 행정 구역에 따른 점수 계산 로직
+    private int calcCapturePoint(String d3) {
+        if (d3 == null) return 0;
+        d3 = d3.trim();
+        if (d3.endsWith("읍") || d3.endsWith("면")) return 10; // 읍, 면이면 +10점
+        if (d3.endsWith("동")) return 5; // 동이면 5점
+        return 0; // 그 외는 점수 없음
+    }
+
+    /* ============================================
+       포인트 차감 (STORE)
+       ============================================ */
+    @Transactional
+    public void use(Long userId, int value, Long sourceId) {
+        if (exists(userId, PointLog.SourceType.STORE, sourceId)) return; // 멱등
+
+        String lockKey = buildLockKey(userId, PointLog.SourceType.STORE, sourceId);
+        if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
+
+        try {
+            if (exists(userId, PointLog.SourceType.STORE, sourceId)) return;
 
             int affected = totalPointRepository.trySubtract(userId, value);
-            if (affected == 0) throw new IllegalStateException("포인트 부족");
+            if (affected == 0)
+                throw new IllegalStateException("포인트 부족");
 
-            // 차감 로그는 음수로 기록
-            pointLogRepository.save(new PointLog(userId, itemOrOrderId, PointLog.SourceType.STORE, -value));
+            pointLogRepository.save(new PointLog(userId, sourceId, PointLog.SourceType.STORE, -value));
         } finally {
-            releaseNamedLock(lockKey);
+            releaseLock(lockKey);
         }
     }
 
-    private String buildLockKey(Long userId, PointLog.SourceType st, Long sourceId) {
-        // MySQL named lock key 문자열 (서버/서비스 구분 접두사 붙이면 더 안전)
-        return "points:" + st.name() + ":" + userId + ":" + sourceId;
+    /* ============================================
+       공통 유틸
+       ============================================ */
+    private boolean exists(Long userId, PointLog.SourceType type, Long sourceId) {
+        return pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, type, sourceId);
     }
 
-    private boolean acquireNamedLock(String key, int timeoutSeconds) {
-        // SELECT GET_LOCK('key', timeout)
-        Integer ok = jdbc.queryForObject("SELECT GET_LOCK(?, ?)", Integer.class, key, timeoutSeconds);
-        return ok != null && ok == 1;
+    private String buildLockKey(Long userId, PointLog.SourceType type, Long sourceId) {
+        return "points:%s:%s:%s".formatted(type.name(), userId, sourceId);
     }
 
-    private void releaseNamedLock(String key) {
-        // DO RELEASE_LOCK('key')
-        jdbc.execute((ConnectionCallback<Void>) conn -> {
-            try (PreparedStatement ps = conn.prepareStatement("DO RELEASE_LOCK(?)")) {
-                ps.setString(1, key);
-                ps.execute();
-            }
-            return null;
-        });
+    private boolean acquireLock(String key, int timeoutSec) {
+        Boolean success = jdbc.queryForObject("SELECT GET_LOCK(?, ?)", Boolean.class, key, timeoutSec);
+        return Boolean.TRUE.equals(success);
+    }
+
+    private void releaseLock(String key) {
+        jdbc.update("SELECT RELEASE_LOCK(?)", key);
     }
 }
+
+
 /*
 목적
 1) 선조회로 대부분의 재요청을 빠르게 걸러냅니다.
