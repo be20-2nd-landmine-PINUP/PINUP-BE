@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>PIN-UP Home</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
@@ -15,7 +20,7 @@
             justify-content: center;
         }
 
-        /* 전체 화면을 왼쪽 카드 + 오른쪽 지도 레이아웃으로 나눔 */
+        /* 전체 화면을 왼쪽 카드 + 오른쪽 지도 레이아웃으로 */
         .wrapper {
             display: flex;
             align-items: flex-start;
@@ -24,6 +29,7 @@
             max-width: 1200px;
         }
 
+        /* 왼쪽 프로필 카드 */
         .container {
             background-color: white;
             border-radius: 20px;
@@ -106,7 +112,7 @@
             background-color: #388E3C;
         }
 
-        /* 지도 스타일 */
+        /* 지도 */
         .map-container {
             flex-grow: 1;
             height: 600px;
@@ -127,7 +133,6 @@
     <!-- 왼쪽: 홈 카드 -->
     <div class="container">
         <img th:src="@{/images/pinup_logo.png}" alt="PINUP 로고" class="logo">
-
         <h1 th:text="'환영합니다, ' + ${user['name']} + '님 🎉'"></h1>
 
         <div class="profile">
@@ -140,54 +145,54 @@
 
         <div class="dashboard">
             <h3>🌏 여행 대시보드</h3>
-            <p class="stat">정복한 지역 수: <span class="highlight" th:text="${user['conqueredCount'] != null ? user['conqueredCount'] : 0}"></span></p>
-            <p class="stat">누적 포인트: <span class="highlight" th:text="${user['totalPoints'] != null ? user['totalPoints'] : 0}"></span></p>
+            <p class="stat">정복한 지역 수:
+                <span class="highlight" th:text="${user['conqueredCount'] != null ? user['conqueredCount'] : 0}"></span></p>
+            <p class="stat">누적 포인트:
+                <span class="highlight" th:text="${user['totalPoints'] != null ? user['totalPoints'] : 0}"></span></p>
         </div>
 
         <a href="/mypage" class="btn mypage-btn">마이페이지</a>
         <a href="/logout" class="btn logout-btn">로그아웃</a>
     </div>
 
-    <!-- 🗺오른쪽: 지도 영역 -->
+    <!-- 오른쪽: 지도 -->
     <div class="map-container">
         <div id="map"></div>
     </div>
 </div>
 
-<!-- Kakao Map SDK -->
-<script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=19f8052f0c0ae312580c82690ae7d661"></script>
-
+<!-- 지도 스크립트 -->
 <script>
-    // 지도 생성
-    var mapContainer = document.getElementById('map');
-    var mapOption = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본: 서울
-        level: 7
-    };
-    var map = new kakao.maps.Map(mapContainer, mapOption);
+    // Leaflet 지도 생성
+    var map = L.map('map', {
+        center: [36.5, 127.9], // 대한민국 중심
+        zoom: 7,
+        zoomControl: true
+    });
 
-    // 내 위치 표시
+    // 윤곽선 전용 타일 (흑백 스타일)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap, © CartoDB',
+        maxZoom: 18,
+        opacity: 0.9
+    }).addTo(map);
+
+    // GPS로 현재 위치 마커 (선택)
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-            var locPosition = new kakao.maps.LatLng(lat, lon);
-
-            var marker = new kakao.maps.Marker({
-                map: map,
-                position: locPosition
-            });
-
-            var info = new kakao.maps.InfoWindow({
-                content: '<div style="padding:5px;font-size:13px;">현재 위치</div>'
-            });
-            info.open(map, marker);
-
-            map.setCenter(locPosition);
+            var marker = L.circleMarker([lat, lon], {
+                radius: 8,
+                fillColor: "#0ba29d",
+                color: "#0ba29d",
+                weight: 2,
+                opacity: 0.8,
+                fillOpacity: 0.8
+            }).addTo(map);
+            marker.bindPopup("📍 현재 위치").openPopup();
+            map.setView([lat, lon], 11);
         });
-    } else {
-        alert("GPS를 지원하지 않는 브라우저입니다.");
     }
 </script>
 </body>
