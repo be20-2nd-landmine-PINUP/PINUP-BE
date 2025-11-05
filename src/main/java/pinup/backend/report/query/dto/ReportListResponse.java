@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReportListResponse {
-    public Integer reportId;
-    public Integer userId;
+    public Long reportId;
+    public Long userId;
     public String reason;
     public String status;
     public LocalDateTime createdAt;

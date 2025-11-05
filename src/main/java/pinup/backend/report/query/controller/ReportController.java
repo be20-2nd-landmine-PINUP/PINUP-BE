@@ -24,7 +24,7 @@ public class ReportController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReportSpecificResponse> getReportById(@PathVariable Integer id) {
+    public ResponseEntity<ReportSpecificResponse> getReportById(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.getSpecificReport(id));
     }
 }

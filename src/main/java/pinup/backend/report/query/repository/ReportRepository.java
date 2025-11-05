@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import pinup.backend.report.query.domain.Report;
 
 @Repository
-public interface ReportRepository extends JpaRepository<Report,String> {
-    Report findByReportId(Integer id);
+public interface ReportRepository extends JpaRepository<Report, Long> {
+    Report findByReportId(Long id);
 }

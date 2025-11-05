@@ -19,19 +19,19 @@ public class ReportService {
 
         return reports.stream().map(report -> ReportListResponse.builder()
                 .reportId(report.getReportId())
-                .userId(report.getUser().getUserId().intValue())
+                .userId(report.getUser().getUserId())
                 .reason(report.getReason())
                 .status(report.getStatus().toString())
                 .createdAt(report.getCreatedAt())
                 .build()).toList();
     }
 
-    public ReportSpecificResponse getSpecificReport(Integer reportId) {
+    public ReportSpecificResponse getSpecificReport(Long reportId) {
         Report report = reportRepository.findByReportId(reportId);
 
         return ReportSpecificResponse.builder()
                 .reportId(report.getReportId())
-                .userId(report.getUser().getUserId().intValue())
+                .userId(report.getUser().getUserId())
                 .reason(report.getReason())
                 .status(report.getStatus().toString())
                 .createdAt(report.getCreatedAt())
