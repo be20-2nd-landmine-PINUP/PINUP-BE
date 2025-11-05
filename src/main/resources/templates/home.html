@@ -166,7 +166,7 @@
     // Leaflet 지도 생성
     var map = L.map('map', {
         center: [36.5, 127.9], // 대한민국 중심
-        zoom: 7,
+        zoom: 6,
         zoomControl: true
     });
 
@@ -191,9 +191,37 @@
                 fillOpacity: 0.8
             }).addTo(map);
             marker.bindPopup("📍 현재 위치").openPopup();
-            map.setView([36.5, 127.9], 6);
         });
     }
+
+    // 지도 색칠하기
+    fetch('https://raw.githubusercontent.com/vuski/admdongkor/master/ver20250401/HangJeongDong_ver20250401.geojson')
+        .then(res => res.json())
+        .then(geoData => {
+            L.geoJSON(geoData, {
+                style: feature => {
+                    // "서울특별시 강남구 역삼동" 안에 "역삼동"이 포함되어 있으면 색칠
+                    if (feature.properties.adm_nm.includes("강남구")) {
+                        return {
+                            color: "#db250d",
+                            weight: 2,
+                            fillColor: "#0ba29d",
+                            fillOpacity: 0.6
+                        };
+                    }
+                    return {
+                        color: "#ccc",
+                        weight: 1,
+                        fillColor: "#f5f5f5",
+                        fillOpacity: 0.1
+                    };
+                },
+                onEachFeature: (feature, layer) => {
+                    layer.bindPopup(feature.properties.adm_nm);
+                }
+            }).addTo(map);
+        })
+        .catch(err => console.error("🚨 GeoJSON 로드 실패:", err));
 </script>
 </body>
 </html>
