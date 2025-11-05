@@ -7,9 +7,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import pinup.backend.member.command.domain.Users;
+import pinup.backend.member.query.dto.UserDto;
+import pinup.backend.member.query.service.UserQueryService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class HomeController {
+
+    private UserQueryService userQueryService;
 
     @GetMapping("/")
     public String home(@AuthenticationPrincipal OAuth2User oAuth2User, Model model) {
@@ -18,5 +25,6 @@ public class HomeController {
         }
         return "home"; // templates/home.html 렌더링
     }
+
 
 }
