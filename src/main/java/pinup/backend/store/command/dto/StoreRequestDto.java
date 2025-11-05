@@ -15,7 +15,7 @@ import pinup.backend.store.command.domain.StoreLimitType;
 @Builder
 public class StoreRequestDto {
 
-    private Integer adminId;
+    private Long adminId;
     private Region region;
     private String name;
     private String description;
