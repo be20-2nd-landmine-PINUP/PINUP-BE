@@ -21,7 +21,7 @@ public class FeedCommandService {
     private final UserRepository userRepository;
 
     public Long createFeed(FeedCreateRequest request) {
-        Users user = userRepository.findById(request.getUserId().intValue())
+        Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         Feed feed = Feed.builder()
