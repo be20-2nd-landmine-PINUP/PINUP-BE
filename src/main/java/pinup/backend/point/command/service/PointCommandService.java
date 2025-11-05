@@ -8,7 +8,11 @@ import pinup.backend.point.command.domain.PointLog;
 import pinup.backend.point.command.repository.PointLogRepository;
 import pinup.backend.point.command.repository.TotalPointRepository;
 
-import java.sql.PreparedStatement;
+import java.time.LocalDateTime;
+
+import java.time.*; // LocalDate, LocalDateTime, ZoneId 등
+
+
 
 // 포인트 적립, 차감하는 기능; 쓰기 전용
 // 중복 체크 -> named lock ->재확인 -> 처리
@@ -109,44 +113,74 @@ public class PointCommandService {
     // 보너스 전용 메서드
     //monthlyKey는 YYYYMM(예: 202510) 그대로 point_log.point_source_id에 들어갑니다.
     @Transactional
-    public void grantMonthlyBonus(Long userId, long monthlyKey) {
-        // 멱등: (userId, CAPTURE, YYYYMM)
-        if (exists(userId, PointLog.SourceType.CAPTURE, monthlyKey)) return;
+    public void grantMonthlyBonus(Long userId, Long territoryId, long monthlyKey) {
+        // 월 구간 계산 (Asia/Seoul)
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        int year = (int) (monthlyKey / 100);
+        int month = (int) (monthlyKey % 100);
+        LocalDateTime from = LocalDate.of(year, month, 1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime to   = LocalDate.of(year, month, 1).plusMonths(1).atStartOfDay(zone).toLocalDateTime();
 
-        String lockKey = buildLockKey(userId, PointLog.SourceType.CAPTURE, monthlyKey);
+        // 보너스 구분용: point_source_id = -territoryId  (INT DDL과 충돌 없음)
+        int bonusSourceId = Math.toIntExact(-territoryId);
+
+        // 멱등: 같은 달에 같은 영토 보너스가 이미 있으면 스킵
+        if (existsBonusThisMonth(userId, bonusSourceId, from, to)) return;
+
+        String lockKey = buildLockKey("BONUS", userId, territoryId, monthlyKey);
         if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            if (exists(userId, PointLog.SourceType.CAPTURE, monthlyKey)) return;
+            if (existsBonusThisMonth(userId, bonusSourceId, from, to)) return;
 
             int value = 10; // 보너스 고정 +10
-            pointLogRepository.save(new PointLog(userId, monthlyKey, PointLog.SourceType.CAPTURE, value));
+            pointLogRepository.save(new PointLog(
+                    userId,
+                    (long) bonusSourceId,               // 음수 territoryId
+                    PointLog.SourceType.CAPTURE,       // DDL 제약상 CAPTURE로 저장
+                    value
+            ));
             totalPointRepository.upsertAdd(userId, value);
         } finally {
             releaseLock(lockKey);
         }
     }
+    private boolean existsBonusThisMonth(Long userId, int bonusSourceId,
+                                         LocalDateTime from, LocalDateTime to) {
+        Integer cnt = jdbc.queryForObject("""
+        SELECT COUNT(*) FROM point_log
+         WHERE user_id = ?
+           AND source_type = 'CAPTURE'
+           AND point_source_id = ?
+           AND created_at >= ?
+           AND created_at <  ?
+    """, Integer.class, userId, bonusSourceId, from, to);
+        return cnt != null && cnt > 0;
+    }
 
 
-    /* ============================================
-       공통 유틸
-       ============================================ */
+    private String buildLockKey(String kind, Long userId, Long territoryId, long monthlyKey) {
+        return "points:%s:%s:%s:%s".formatted(kind, userId, territoryId, monthlyKey);
+    }
+
+    private boolean acquireLock(String key, int timeoutSec) {
+        Integer r = jdbc.queryForObject("SELECT GET_LOCK(?, ?)", Integer.class, key, timeoutSec);
+        return r != null && r == 1;
+    }
+
+    private void releaseLock(String key) {
+        jdbc.queryForObject("SELECT RELEASE_LOCK(?)", Integer.class, key);
+    }
+
+    // 추가 ⬇️
+    private String buildLockKey(Long userId, PointLog.SourceType type, Long sourceId) {
+        return "points:%s:%s:%s".formatted(type.name(), userId, sourceId);
+    }
     private boolean exists(Long userId, PointLog.SourceType type, Long sourceId) {
         return pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, type, sourceId);
     }
 
-    private String buildLockKey(Long userId, PointLog.SourceType type, Long sourceId) {
-        return "points:%s:%s:%s".formatted(type.name(), userId, sourceId);
-    }
 
-    private boolean acquireLock(String key, int timeoutSec) {
-        Boolean success = jdbc.queryForObject("SELECT GET_LOCK(?, ?)", Boolean.class, key, timeoutSec);
-        return Boolean.TRUE.equals(success);
-    }
-
-    private void releaseLock(String key) {
-        jdbc.update("SELECT RELEASE_LOCK(?)", key);
-    }
 }
 
 

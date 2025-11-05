@@ -7,59 +7,85 @@ import org.springframework.stereotype.Component;
 
 import java.time.*;
 import java.util.List;
-
+import org.apache.commons.lang3.tuple.Pair;
 @Component
 public class MonthlyBonusScheduler {
 
     private final JdbcTemplate jdbc;
     private final PointCommandService pointService;
+    private final Clock clock; // 테스트/재현을 위한 주입 권장
 
     @Value("${point.bonus.batch-size:500}")
     private int batchSize;
 
-    public MonthlyBonusScheduler(JdbcTemplate jdbc, PointCommandService pointService) {
+    @Value("${point.bonus.dry-run:false}")
+    private boolean dryRun;
+
+    public MonthlyBonusScheduler(JdbcTemplate jdbc, PointCommandService pointService, Clock clock) {
         this.jdbc = jdbc;
         this.pointService = pointService;
+        this.clock = clock;
     }
 
-    // 매월 1일 00:05 KST; 시간 기준 맞춰야함
+    // 매월 1일 00:05 KST
     @Scheduled(cron = "${point.bonus.cron}", zone = "Asia/Seoul")
     public void grantMonthlyBonus() {
         ZoneId zone = ZoneId.of("Asia/Seoul");
-        YearMonth targetYm = YearMonth.now(zone).minusMonths(1);
+        YearMonth targetYm = YearMonth.from(ZonedDateTime.now(clock).withZoneSameInstant(zone)).minusMonths(1);
         long monthlyKey = targetYm.getYear() * 100L + targetYm.getMonthValue(); // 예: 202510
 
-        var from = targetYm.atDay(1).atStartOfDay();
-        var to   = targetYm.plusMonths(1).atDay(1).atStartOfDay();
+        Instant from = targetYm.atDay(1).atStartOfDay(zone).toInstant();
+        Instant to   = targetYm.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant();
 
-        int offset = 0;
+        Long lastUserId = null;      // 키셋 페이징용
+        Long lastTerritoryId = null; // 키셋 페이징용
+
         while (true) {
-            // 전월 유효 방문 수 ≤ 100인 territory 소유자 user_id 목록 페이징 조회
-            List<Long> userIds = jdbc.query("""
-                SELECT DISTINCT t.user_id
+            // 지난달 유효 방문 수 ≤ 100인 (user_id, territory_id) 페어를 키셋 페이징으로 조회
+            List<Pair<Long, Long>> rows = jdbc.query("""
+                SELECT t.user_id, t.territory_id
                   FROM territory t
                  WHERE (
-                    SELECT COUNT(*) FROM territory_visit_log v
+                    SELECT COUNT(*)
+                      FROM territory_visit_log v
                      WHERE v.territory_id = t.territory_id
                        AND v.is_valid = TRUE
                        AND v.visited_at >= ?
                        AND v.visited_at <  ?
                  ) <= 100
-                 ORDER BY t.user_id
-                 LIMIT ? OFFSET ?
-            """, (rs, i) -> rs.getLong(1),
-                    from, to, batchSize, offset);
+                   AND (
+                        ? IS NULL
+                        OR (t.user_id > ?)
+                        OR (t.user_id = ? AND t.territory_id > ?)
+                   )
+                 ORDER BY t.user_id, t.territory_id
+                 LIMIT ?
+            """, (rs, i) -> Pair.of(rs.getLong(1), rs.getLong(2)),
+                    from, to,
+                    lastUserId, lastUserId, lastUserId, lastTerritoryId,
+                    batchSize);
 
-            if (userIds.isEmpty()) break;
+            if (rows.isEmpty()) break;
 
-            for (Long userId : userIds) {
-                // 보너스는 CAPTURE 타입 + source_id=YYYYMM (멱등 키)
-                pointService.grantMonthlyBonus(userId, monthlyKey);
+            for (Pair<Long, Long> row : rows) {
+                Long userId = row.getLeft();
+                Long territoryId = row.getRight();
+
+                if (dryRun) {
+                    // 드라이런이면 로그만
+                    // log.info("DRY-RUN bonus target user={}, territory={}, month={}", userId, territoryId, monthlyKey);
+                } else {
+                    // B안: 영토당 월1회 부여
+                    pointService.grantMonthlyBonus(userId, territoryId, monthlyKey);
+                }
+
+                lastUserId = userId;
+                lastTerritoryId = territoryId;
             }
-            offset += userIds.size();
         }
     }
 }
+
 /*
 
 
