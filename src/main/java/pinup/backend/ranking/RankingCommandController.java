@@ -1,4 +1,4 @@
-package pinup.backend.ranking.command.controller;
+package pinup.backend.ranking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
