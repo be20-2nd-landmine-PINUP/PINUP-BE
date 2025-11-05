@@ -12,10 +12,10 @@ import java.util.List;
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
     // 유저 인벤토리 아이템 조회
-    List<Inventory> findAllByUsers(Users userId);
+    List<Inventory> findAllByUsers_UserId(Long userId);
 
     // 유저의 장착 중인 아이템 조회
-    List<Inventory> findByUsers_UserIdAndIsEquippedTrue(Long users);
+    List<Inventory> findByUsers_UserIdAndIsEquippedTrue(Long userId);
 
     // 유저의 특정 아이템 보유 확인
     boolean existsByUsersAndStore(Users users, Store store);
