@@ -10,7 +10,7 @@
         FROM notice
     </select>
 
-    <select id="getNoticeSpecific" parameterType="java.lang.Integer" resultType="pinup.backend.notice.query.dto.NoticeSpecificResponse">
+    <select id="getNoticeSpecific" parameterType="java.lang.Long" resultType="pinup.backend.notice.query.dto.NoticeSpecificResponse">
         SELECT notice_id, admin_id, notice_title, notice_content, created_at, updated_at
         FROM notice
         WHERE notice_id = #{noticeId}

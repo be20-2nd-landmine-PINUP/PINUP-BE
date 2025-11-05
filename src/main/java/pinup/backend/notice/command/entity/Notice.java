@@ -21,7 +21,7 @@ public class Notice {
     @Id
     @Column(name = "notice_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer noticeId;
+    private Long noticeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

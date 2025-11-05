@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class NoticeListResponse {
-    private Integer noticeId;
+    private Long noticeId;
     private String noticeTitle;
     private LocalDateTime createdAt;
 }
