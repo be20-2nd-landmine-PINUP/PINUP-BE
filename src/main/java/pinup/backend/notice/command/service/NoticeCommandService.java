@@ -4,7 +4,6 @@ package pinup.backend.notice.command.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseBody;
 import pinup.backend.member.command.domain.Admin;
 import pinup.backend.member.command.repository.AdminRepository;
 import pinup.backend.notice.command.dto.NoticePostRequest;
@@ -20,7 +19,7 @@ public class NoticeCommandService {
     private final AdminRepository adminRepository;
 
     public Integer postNotice(NoticePostRequest request) {
-        Admin admin = adminRepository.findById((request.getAdminId().longValue())).orElseThrow(IllegalArgumentException::new);
+        Admin admin = adminRepository.findById((int) request.getAdminId().longValue()).orElseThrow(IllegalArgumentException::new);
 
         return noticeRepository.save(Notice.builder()
                 .noticeContent(request.getNoticeContent())

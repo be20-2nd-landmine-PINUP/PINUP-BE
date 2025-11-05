@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pinup.backend.store.query.mapper.StoreMapper">
+
+    <!--  전체 아이템 조회 -->
+    <select id="findAllActiveItems" resultType="pinup.backend.store.query.dto.StoreResponseDto">
+        SELECT
+            s.item_id      AS itemId,
+            s.name         AS name,
+            s.description  AS description,
+            s.price        AS price,
+            s.category     AS category,
+            s.limit_type   AS limitType,
+            s.image_url    AS imageUrl,
+            s.is_active    AS isActive,
+            r.region_name  AS regionName
+        FROM store s
+                 LEFT JOIN region r ON s.region_id = r.region_id
+        WHERE s.is_active = TRUE
+        ORDER BY s.item_id DESC
+    </select>
+
+    <!--  특정 아이템 조회 -->
+    <select id="findItemById" parameterType="int" resultType="pinup.backend.store.query.dto.StoreResponseDto">
+        SELECT
+            s.item_id      AS itemId,
+            s.name         AS name,
+            s.description  AS description,
+            s.price        AS price,
+            s.category     AS category,
+            s.limit_type   AS limitType,
+            s.image_url    AS imageUrl,
+            s.is_active    AS isActive,
+            r.region_name  AS regionName
+        FROM store s
+                 LEFT JOIN region r ON s.region_id = r.region_id
+        WHERE s.item_id = #{itemId}
+    </select>
+
+</mapper>
