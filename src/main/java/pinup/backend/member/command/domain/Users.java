@@ -22,7 +22,7 @@ public class Users {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false, length = 10)
-    private LoginType loginType; // GOOGLE / KAKAO
+    private LoginType loginType; // GOOGLE, KAKAO, NAVER
 
     @Column(name = "user_name", nullable = false, length = 20)
     private String name;
@@ -86,7 +86,7 @@ public class Users {
 
     // ENUM 정의
     public enum LoginType {
-        GOOGLE, KAKAO
+        GOOGLE, KAKAO, NAVER
     }
 
     public enum Gender {

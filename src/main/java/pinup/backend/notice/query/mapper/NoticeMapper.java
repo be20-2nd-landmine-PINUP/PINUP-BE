@@ -11,5 +11,5 @@ import java.util.List;
 public interface NoticeMapper {
     List<NoticeListResponse> getNoticeList();
 
-    NoticeSpecificResponse getNoticeSpecific(@Param("noticeId") Integer id);
+    NoticeSpecificResponse getNoticeSpecific(@Param("noticeId") Long id);
 }

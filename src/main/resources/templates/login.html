@@ -31,7 +31,7 @@
             color: #333;
             margin-bottom: 30px;
         }
-        .google-btn, .kakao-btn {
+        .google-btn, .kakao-btn, .naver-btn {
             width: 100%;
             border: none;
             border-radius: 5px;
@@ -58,7 +58,14 @@
         .kakao-btn:hover {
             background-color: #e6cc00;
         }
-        .google-icon, .kakao-icon {
+        .naver-btn {
+            background-color: #03C75A;
+            color: white;
+        }
+        .naver-btn:hover {
+            background-color: #02b34f;
+        }
+        .google-icon, .kakao-icon, .naver-icon {
             width: 22px;
             height: 22px;
             margin-right: 10px;
@@ -105,7 +112,14 @@
         </button>
     </a>
 
-    <p class="footer-text">PIN-UP에 처음이신가요? <span>Google 또는 Kakao로 시작하세요.</span></p>
+    <a href="/oauth2/authorization/naver" style="text-decoration:none;">
+        <button class="naver-btn">
+            <img class="naver-icon" th:src="@{/images/naver_icon.png}" alt="Naver logo">
+            Naver로 로그인
+        </button>
+    </a>
+
+    <p class="footer-text">PIN-UP에 처음이신가요? <span>Google, Kakao 또는 Naver로 시작하세요.</span></p>
 
     <a href="/admin/login" class="admin-link">관리자 로그인</a>
 
