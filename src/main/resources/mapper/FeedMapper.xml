@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pinup.backend.feed.query.mapper.FeedQueryMapper">
+
+    <!-- 공통 조인: feed ↔ users -->
+    <sql id="feedJoin">
+        FROM feed f
+    JOIN users u ON u.user_id = f.user_id
+    </sql>
+
+    <!-- 공통 WHERE: (필요 시 확장) -->
+    <sql id="baseWhere">
+        <where>
+            <if test="cursorId != null">
+                AND f.feed_id &lt; #{cursorId}
+            </if>
+            <!-- 예: 신고/삭제 제외 규칙이 생기면 여기에 추가 -->
+            <!-- AND f.report_count = 0 -->
+        </where>
+    </sql>
+
+    <!-- 카드용 -->
+    <sql id="cardColumns">
+        f.feed_id                         AS id,
+    f.title                           AS title,
+    f.image_url                       AS imageUrl,
+    COALESCE(u.nickname, u.user_name) AS authorName,
+    f.created_at                      AS createdAt
+    </sql>
+
+    <!-- 상세용 -->
+    <sql id="detailColumns">
+        f.feed_id                         AS id,
+    COALESCE(u.nickname, u.user_name) AS authorName,
+    u.profile_image                   AS authorProfileImage,
+    f.title                           AS title,
+    f.content                         AS content,
+    f.image_url                       AS imageUrl,
+    f.like_count                      AS likeCount,
+    f.created_at                      AS createdAt
+    </sql>
+
+    <!-- for list(slice) -->
+    <select id="selectFeedSlice"
+            parameterType="map"
+            resultType="pinup.backend.feed.query.dto.FeedCardDto">
+        SELECT
+        <include refid="cardColumns"/>
+        <include refid="feedJoin"/>
+        <include refid="baseWhere"/>
+        ORDER BY f.feed_id DESC
+        LIMIT #{limitPlusOne}
+    </select>
+
+    <!-- for View -->
+    <select id="selectFeedDetail"
+            parameterType="long"
+            resultType="pinup.backend.feed.query.dto.FeedQueryDto">
+        SELECT
+        <include refid="detailColumns"/>
+        <include refid="feedJoin"/>
+        WHERE f.feed_id = #{id}
+        LIMIT 1
+    </select>
+
+</mapper>
