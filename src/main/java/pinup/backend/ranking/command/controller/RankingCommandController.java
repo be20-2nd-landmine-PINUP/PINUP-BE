@@ -2,11 +2,12 @@ package pinup.backend.ranking.command.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pinup.backend.ranking.command.service.RankingCommandService;
 
 import java.time.YearMonth;
+import java.util.Map;
+
 
 // restapi 컨트롤러; rest요청 처리, json 형태로 응답 반환
 @RestController
@@ -20,18 +21,29 @@ public class RankingCommandController {
     // 생성자 주입을 통해 자동으로 주입
     private final RankingCommandService commandService;
     // "POST /api/rankings/command/monthly/build" 요청을 처리한다.
-    // 관리자 권한(ROLE_ADMIN)이 있어야 호출 가능하도록 제한.
+
+
     @PostMapping("/monthly/build")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> build(@RequestParam String ym) {
-        // 요청 파라미터로 전달된 YM연월 값 검증
+    public ResponseEntity<Map<String, Object>> build(@RequestParam String ym) {
+        // 요청 파라미터 검증
         validateYm(ym);
-        //문자열 형태의 연월(YYYY-MM)을 YearMonth 객체로 변환 후,
-        // 해당 연월의 월간 랭킹을 생성하도록 서비스 계층에 위임
+
+        // 서비스 계층에 월별 랭킹 집계 위임
         commandService.buildMonthlyRanking(YearMonth.parse(ym));
-        //202(ACCEPTED)상태 코드 반환; 요청 수락, 비동기로도 처리 가능
-        return ResponseEntity.accepted().build();
+
+        // 응답 본문(바디)에 간단한 상태 정보 포함
+        Map<String, Object> body = Map.of(
+                "status", "accepted",
+                "ym", ym,
+                "message", "월간 랭킹 집계 요청이 정상적으로 처리되었습니다."
+        );
+
+        // HTTP 202 + body 반환
+        return ResponseEntity.accepted().body(body);
     }
+
+
+
     // YM(연월)값 형식과 범위 검증한느 유틸리티 메서드
     private static void validateYm(String ym) {
         //NULL이거나 "YYYY-MM" 형태가 아닐 경우 예외 발생.
