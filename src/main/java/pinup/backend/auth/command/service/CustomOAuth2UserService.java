@@ -58,7 +58,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (picture == null || picture.isBlank()) {
                 picture = "/images/default_profile.png"; // 기본 이미지 경로
             }
-
+        }
+        // Naver 로그인 처리
+        else if ("naver".equals(registrationId)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            email = (String) response.get("email");
+            name = (String) response.get("name");
+            picture = (String) response.getOrDefault("profile_image", "/images/default_profile.png");
         } else {
             picture = null;
             email = null;
@@ -71,7 +77,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Optional<Users> existingUser = memberCommandRepository.findByEmail(email);
         if (existingUser.isEmpty()) {
             Users newUser = Users.builder()
-                    .loginType("google".equals(registrationId) ? Users.LoginType.GOOGLE : Users.LoginType.KAKAO)
+                    .loginType(
+                            switch (registrationId) {
+                                case "google" -> Users.LoginType.GOOGLE;
+                                case "kakao" -> Users.LoginType.KAKAO;
+                                case "naver" -> Users.LoginType.NAVER;
+                                default -> Users.LoginType.GOOGLE;
+                            }
+                    )
                     .name(name)
                     .email(email)
                     .nickname(name)
@@ -85,7 +98,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberCommandRepository.save(newUser);
         }
 
-        // Google / Kakao 관계없이 공통된 필드 구조로 반환
+        // Google / Kakao / Naver 관계없이 공통된 필드 구조로 반환
         Map<String, Object> unifiedAttributes = new HashMap<>();
         unifiedAttributes.put("name", name);
         unifiedAttributes.put("email", email);
