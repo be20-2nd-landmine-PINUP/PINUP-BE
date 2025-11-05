@@ -75,11 +75,11 @@ public class NoticeQueryTest {
     @DisplayName("공지사항이 등록된다")
     void postNoticeTest() {
         NoticePostRequest request = NoticePostRequest.builder()
-                .adminId(1)
+                .adminId(1L)
                 .noticeTitle("Test Title 3")
                 .noticeContent("Test Content 3")
                 .build();
-        Integer id = noticeCommandService.postNotice(request);
+        Long id = noticeCommandService.postNotice(request);
 
         assertThat(noticeRepository.findById(id).get().getNoticeTitle()).isEqualTo("Test Title 3");
     }
@@ -109,7 +109,7 @@ public class NoticeQueryTest {
                 .admin(admin)
                 .build();
         noticeRepository.save(notice);
-        Integer noticeId = notice.getNoticeId();
+        Long noticeId = notice.getNoticeId();
 
         // when
         NoticeSpecificResponse foundNotice = noticeQueryService.getNoticeById(noticeId);

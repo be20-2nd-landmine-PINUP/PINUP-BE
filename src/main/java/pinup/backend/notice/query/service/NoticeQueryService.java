@@ -20,7 +20,7 @@ public class NoticeQueryService {
         return noticeMapper.getNoticeList();
     }
 
-    public NoticeSpecificResponse getNoticeById(Integer id) {
+    public NoticeSpecificResponse getNoticeById(Long id) {
         return noticeMapper.getNoticeSpecific(id);
     }
 }

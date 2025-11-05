@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/store")
+@RequestMapping("/store/query")
 public class StoreQueryController {
 
     private final StoreQueryService storeQueryService;

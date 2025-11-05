@@ -8,7 +8,7 @@ import pinup.backend.feed.command.dto.FeedCreateRequest;
 import pinup.backend.feed.command.dto.FeedUpdateRequest;
 import pinup.backend.feed.command.entity.Feed;
 import pinup.backend.feed.command.repository.FeedRepository;
-import pinup.backend.feed.common.exceptioRes.FeedNotFoundException;
+import pinup.backend.feed.common.exception.FeedNotFoundException;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
 

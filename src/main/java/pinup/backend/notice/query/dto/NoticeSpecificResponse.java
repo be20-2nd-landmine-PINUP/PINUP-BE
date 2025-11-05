@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class NoticeSpecificResponse {
-    private Integer noticeId;
-    private Integer adminId;
+    private Long noticeId;
+    private Long adminId;
     private String noticeTitle;
     private String noticeContent;
     private LocalDateTime createdAt;
