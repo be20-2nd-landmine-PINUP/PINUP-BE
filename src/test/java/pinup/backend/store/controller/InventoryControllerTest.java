@@ -76,7 +76,7 @@ public class InventoryControllerTest {
         mockMvc.perform(get("/inventory")
                         .requestAttr("user", testUser))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].store.name").value("테스트 배경"))
+                .andExpect(jsonPath("$[0].itemName").value("테스트 배경"))
                 .andDo(print());
 
         verify(inventoryService, times(1)).getUserInventory(any(Users.class));
