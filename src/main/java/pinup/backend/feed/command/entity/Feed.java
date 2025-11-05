@@ -1,4 +1,4 @@
-package pinup.backend.feed.entity;
+package pinup.backend.feed.command.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,7 +20,7 @@ public class Feed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "feed_id")
-    private int feedId;
+    private Long feedId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -49,5 +49,12 @@ public class Feed {
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
+    }
+
+    // 피드 수정 간 사용할 메소드
+    public void update(String title, String content, String imageUrl) {
+        if (title != null && !title.isBlank()) this.title = title;
+        if (content != null && !content.isBlank()) this.content = content;
+        if (imageUrl != null && !imageUrl.isBlank()) this.imageUrl = imageUrl;
     }
 }
