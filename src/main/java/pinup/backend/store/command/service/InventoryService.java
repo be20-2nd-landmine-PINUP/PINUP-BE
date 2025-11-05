@@ -18,8 +18,8 @@ public class InventoryService {
    private final InventoryRepository inventoryRepository;
 
     // 유저의 보유 아이템 조회
-    public List<Inventory> getUserInventory(Users user) {
-        return inventoryRepository.findAllByUsers(user);
+    public List<Inventory> getUserInventory(Long userId) {
+        return inventoryRepository.findAllByUsers_UserId(userId);
     }
 
     // 유저의 장착 중인 아이템 목록 조회

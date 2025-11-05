@@ -70,16 +70,16 @@ public class InventoryControllerTest {
     @Test
     @DisplayName("보유 아이템 조회 성공")
     void getUserInventory() throws Exception {
-        when(inventoryService.getUserInventory(any(Users.class)))
+        when(inventoryService.getUserInventory(any(Long.class)))
                 .thenReturn(List.of(testInventory));
 
         mockMvc.perform(get("/inventory")
-                        .requestAttr("user", testUser))
+                        .requestAttr("userId", testUser))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].store.name").value("테스트 배경"))
+                .andExpect(jsonPath("$[0].itemName").value("테스트 배경"))
                 .andDo(print());
 
-        verify(inventoryService, times(1)).getUserInventory(any(Users.class));
+        verify(inventoryService, times(1)).getUserInventory(any(Long.class));
     }
 
     /*

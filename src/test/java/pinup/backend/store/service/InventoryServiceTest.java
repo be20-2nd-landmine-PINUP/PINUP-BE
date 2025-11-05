@@ -59,14 +59,14 @@ public class InventoryServiceTest {
     @Test
     @DisplayName("유저 보유 아이템 조회 성공")
     void getUserInventory() {
-        when(inventoryRepository.findAllByUsers(testUser))
+        when(inventoryRepository.findAllByUsers_UserId(testUser.getUserId()))
                 .thenReturn(List.of(testInventory));
 
-        List<Inventory> result = inventoryService.getUserInventory(testUser);
+        List<Inventory> result = inventoryService.getUserInventory(testUser.getUserId());
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getStore().getName()).isEqualTo("테스트 아이템");
-        verify(inventoryRepository, times(1)).findAllByUsers(testUser);
+        verify(inventoryRepository, times(1)).findAllByUsers_UserId(testUser.getUserId());
     }
 
     @Test
