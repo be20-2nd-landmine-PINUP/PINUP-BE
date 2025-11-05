@@ -16,19 +16,19 @@ public class AdminUserCommandController {
     private final UserCommandService userCommandService;
 
     @PostMapping("/{id}/suspend")
-    public String suspendUser(@PathVariable Integer id) {
+    public String suspendUser(@PathVariable Long id) {
         userCommandService.suspendUser(id);
         return "redirect:/admin/users"; // 목록으로 리다이렉트
     }
 
     @PostMapping("/{id}/activate")
-    public String activateUser(@PathVariable Integer id) {
+    public String activateUser(@PathVariable Long id) {
         userCommandService.activateUser(id);
         return "redirect:/admin/users";
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteUser(@PathVariable Integer id) {
+    public String deleteUser(@PathVariable Long id) {
         userCommandService.deleteUser(id);
         return "redirect:/admin/users";
     }

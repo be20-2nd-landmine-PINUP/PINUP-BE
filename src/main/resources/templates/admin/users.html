@@ -47,11 +47,44 @@
             border-radius: 8px;
             text-decoration: none;
         }
+        .filter-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .btn-all {
+            background-color: #4CAF50;
+        }
+        .btn-all:hover {
+            background-color: #388E3C;
+        }
+        .btn-suspended {
+            background-color: #f44336;
+        }
+        .btn-suspended:hover {
+            background-color: #d32f2f;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>회원 관리</h1>
+
+    <div class="filter-buttons">
+        <a href="/admin/users" class="btn btn-all">전체 회원 보기</a>
+        <a href="/admin/users/suspended" class="btn btn-suspended">정지된 회원 보기</a>
+    </div>
+
 
     <table>
         <thead>
@@ -68,19 +101,19 @@
         <tbody>
 
         <tr th:each="user : ${users}">
-            <td th:text="${user.id}"></td>
+            <td th:text="${user.userId}"></td>
             <td th:text="${user.name}"></td>
             <td th:text="${user.nickname}"></td>
             <td th:text="${user.email}"></td>
             <td th:text="${user.status}"></td>
             <td>
-                <form th:action="@{'/admin/users/' + ${user.id} + '/suspend'}" method="post" style="display:inline;">
+                <form th:action="@{'/admin/users/' + ${user.userId} + '/suspend'}" method="post" style="display:inline;">
                     <button type="submit">정지</button>
                 </form>
-                <form th:action="@{'/admin/users/' + ${user.id} + '/activate'}" method="post" style="display:inline;">
+                <form th:action="@{'/admin/users/' + ${user.userId} + '/activate'}" method="post" style="display:inline;">
                     <button type="submit">활성화</button>
                 </form>
-                <form th:action="@{'/admin/users/' + ${user.id} + '/delete'}" method="post" style="display:inline;">
+                <form th:action="@{'/admin/users/' + ${user.userId} + '/delete'}" method="post" style="display:inline;">
                     <button type="submit">삭제</button>
                 </form>
             </td>
