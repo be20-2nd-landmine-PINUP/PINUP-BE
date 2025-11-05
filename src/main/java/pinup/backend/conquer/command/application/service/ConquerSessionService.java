@@ -73,6 +73,8 @@ public class ConquerSessionService {
 
         // Success
         session.setStatus(ConquerSession.Status.COMPLETED);
+        // earn point by success
+        //pointservice.calcCapturePoint(currentRegion.getRegionDepth3());
         session.setEndedAt(now);
         conquerSessionRepository.save(session);
 
