@@ -93,7 +93,7 @@ public class StoreService {
     }
 
     // 아이템 등록(관리자 전용)
-    public Store registerItem(Integer adminId, StoreRequestDto dto) {
+    public Store registerItem(Long adminId, StoreRequestDto dto) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
 
