@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.feed.command.dto.FeedCreateRequest;
 import pinup.backend.feed.command.dto.FeedUpdateRequest;
 import pinup.backend.feed.command.entity.Feed;
+import pinup.backend.feed.command.repository.FeedLikeRepository;
 import pinup.backend.feed.command.repository.FeedRepository;
 import pinup.backend.feed.common.exception.FeedNotFoundException;
 import pinup.backend.member.command.domain.Users;
@@ -19,6 +20,7 @@ public class FeedCommandService {
 
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
+    private final FeedLikeRepository feedLikeRepository; // ★ 추가
 
     public Long createFeed(FeedCreateRequest request) {
         Users user = userRepository.findById(request.getUserId())
@@ -31,7 +33,7 @@ public class FeedCommandService {
                 .imageUrl(request.getImageUrl())
                 .build();
 
-            feedRepository.save(feed);
+        feedRepository.save(feed);
         return feed.getFeedId();
     }
 
@@ -43,9 +45,12 @@ public class FeedCommandService {
     }
 
     public void deleteFeed(Long feedId) {
+        // 1) 좋아요 선삭제 (FK 제약 회피)
+        feedLikeRepository.deleteAllByFeedLikeId_FeedId(feedId);
+
+        // 2) 피드 삭제
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedNotFoundException(feedId));
-
         feedRepository.delete(feed);
     }
 }
