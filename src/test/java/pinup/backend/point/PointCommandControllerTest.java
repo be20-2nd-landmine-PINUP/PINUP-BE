@@ -11,8 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import pinup.backend.point.command.controller.PointCommandController;
-import pinup.backend.point.command.service.PointCommandService;
 
 import java.util.Map;
 
