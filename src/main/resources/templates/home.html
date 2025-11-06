@@ -340,7 +340,7 @@
     /* 알림 */
 
     // 실시간 알림 연결 (userId는 로그인된 사용자 ID로 대체)
-    const eventSource = new EventSource(`/notifications/connect/1`);
+    const eventSource = new EventSource(`/sse/connect/1`);
 
     eventSource.addEventListener("connect", (event) => {
         console.log("SSE 연결 성공:", event.data);
