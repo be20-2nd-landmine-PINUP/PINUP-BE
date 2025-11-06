@@ -336,6 +336,34 @@
         dropdown.classList.toggle("show");
     }
 
+
+    /* 알림 */
+
+    // 실시간 알림 연결 (userId는 로그인된 사용자 ID로 대체)
+    const eventSource = new EventSource(`/notifications/connect/1`);
+
+    eventSource.addEventListener("connect", (event) => {
+        console.log("SSE 연결 성공:", event.data);
+    });
+
+    eventSource.addEventListener("new notification", (event) => {
+        const data = JSON.parse(event.data); // JSON 문자열 → 객체
+
+        // 콘솔 확인용
+        console.log("📬 새 알림:", data.notificationMessage);
+
+        // 알림창에 li 추가
+        const list = document.getElementById("notif-list");
+        const li = document.createElement("li");
+        li.textContent = "🚫 " + data.notificationMessage;
+        li.style.color = "red"; // 빨간색 표시
+        list.prepend(li);
+    });
+
+    eventSource.onerror = (err) => {
+        console.error("SSE 연결 오류:", err);
+    };
+
     // 알림 추가 예시
     function addNotification(message) {
         const list = document.getElementById("notif-list");
@@ -345,14 +373,11 @@
 
         // 뱃지 수 업데이트
         const badge = document.getElementById("notif-count");
-        let count = parseInt(badge.textContent);
-        badge.textContent = count + 1;
+        if (badge) {
+            let count = parseInt(badge.textContent) || 0;
+            badge.textContent = count + 1;
+        }
     }
-
-    // 테스트용
-    setTimeout(() => {
-        addNotification("📍 새로운 여행 인증이 등록되었습니다!");
-    }, 4000);
 
     // 클릭 외부 영역 클릭 시 닫기
     window.addEventListener('click', (e) => {
