@@ -13,19 +13,17 @@ import pinup.backend.feed.common.exception.DuplicateLikeException;
 import pinup.backend.feed.common.exception.FeedNotFoundException;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
+import pinup.backend.point.command.service.PointCommandService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class FeedLikeCommandService {
 
-    private static final int POINT_PER_LIKE = 1; // ← 필요 시 설정값으로 교체
-
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final UserRepository userRepository;
-    // private final {실제 쓸 포인트 이력 리포지토리}
-    // private final {실제 쓸 포인트 지갑 리포지토리};
+    private final PointCommandService pointCommandService; // 우선은 서비스 직접 등록
 
     public record LikeResult(boolean liked, long likeCount) {}
 
@@ -36,14 +34,13 @@ public class FeedLikeCommandService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. userId=" + userId));
 
-        // 서비스단 빠른 중복 차단
+        // 서비스단 중복 차단
         boolean already = feedLikeRepository
                 .existsByFeedLikeId_UserIdAndFeedLikeId_FeedId(userId, feedId);
         if (already) {
             throw new DuplicateLikeException(feedId, userId);
         }
 
-        // 저장 시도 (PK (user_id, feed_id)로 최종 중복 방어)
         try {
             FeedLike like = FeedLike.builder()
                     .feedLikeId(new FeedLikeId(userId, feedId))
@@ -55,15 +52,13 @@ public class FeedLikeCommandService {
 
             // 카운트 증가
             feedRepository.incrementLikeCount(feedId);
-            /*
-            // 포인트 지급 (피드 작성자에게) — 최초 성공시에만
-            Long authorId = feed.getUserId().getUserId();
 
-            {실제 쓸 포인트 이력 리포지토리} 증가 메소드 (authorId, feedId, POINT_PER_LIKE);
-            {실제 쓸 포인트 지갑 리포지토리} 증가 메소드 (authorId, POINT_PER_LIKE);
-            */
+            // 좋아요 포인트 지급
+            Long authorId = feed.getUserId().getUserId();
+            pointCommandService.grantLike(authorId, feedId);
+
         } catch (DataIntegrityViolationException e) {
-            // 중복 insert 발생 → 중복 좋아요로 간주
+            // 중복 insert 발생은 중복 좋아요로 간주
             throw new DuplicateLikeException(feedId, userId);
         }
 
