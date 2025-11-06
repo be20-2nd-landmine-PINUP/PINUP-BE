@@ -1,8 +1,8 @@
 package pinup.backend.store.query.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import pinup.backend.store.query.dto.StoreResponseDto;
+import pinup.backend.store.command.dto.StoreDetailResponseDto;
+import pinup.backend.store.command.dto.StoreSummaryResponseDto;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import java.util.List;
 public interface StoreMapper {
 
     // 전체 아이템 조회
-    List<StoreResponseDto> findAllActiveItems();
+    List<StoreSummaryResponseDto> findAllActiveItems();
 
     // 특정 아이템 상세 조회
-    StoreResponseDto findItemById(@Param("itemId") Integer itemId);
+    StoreDetailResponseDto findItemById(Integer itemId);
 
 }

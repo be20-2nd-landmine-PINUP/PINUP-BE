@@ -16,5 +16,6 @@ public class StoreSummaryResponseDto {
     private Integer price;
     private String category;
     private String imageUrl;
-    private boolean isLimited;
+    private String isLimited;
+    private Boolean isActive;
 }

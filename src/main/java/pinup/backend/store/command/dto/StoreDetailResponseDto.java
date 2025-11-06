@@ -1,11 +1,15 @@
 package pinup.backend.store.command.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import pinup.backend.store.command.domain.Inventory;
 import pinup.backend.store.command.domain.Store;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class StoreDetailResponseDto {
 
@@ -17,6 +21,7 @@ public class StoreDetailResponseDto {
     private String category;
     private String imageUrl;
     private Boolean isActive;
+    private String limitType;
 
     //지역 정보
     private Integer regionCode;
