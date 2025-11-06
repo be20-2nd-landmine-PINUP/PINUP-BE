@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,7 +16,7 @@ import pinup.backend.member.command.repository.AdminRepository;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig{
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAdminDetailsService customAdminDetailsService;
@@ -70,6 +71,11 @@ public class SecurityConfig {
                         .build());
             }
         };
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/notifications/**");
     }
 
 }

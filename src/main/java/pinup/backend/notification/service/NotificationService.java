@@ -13,12 +13,13 @@ import java.util.Map;
 public class NotificationService {
     private final Map<Integer, SseEmitter> sseEmitter;
 
-    public SseEmitter establishConnect(Integer clientId) {
+    public SseEmitter establishConnect(Long clientId) {
         Long connectionTimeout = 60 * 1000L;
+        Integer clientIdInt = clientId.intValue();
 
         SseEmitter emitter = new SseEmitter(connectionTimeout);
 
-        sseEmitter.put(clientId, emitter);
+        sseEmitter.put(clientIdInt, emitter);
 
         emitter.onTimeout(() -> {
             try {
@@ -29,8 +30,8 @@ public class NotificationService {
             emitter.complete();  // 이 호출로 onCompletion() 자동 실행됨
         });
 
-        emitter.onCompletion(() -> sseEmitter.remove(clientId));
-        emitter.onError(e -> sseEmitter.remove(clientId));
+        emitter.onCompletion(() -> sseEmitter.remove(clientIdInt));
+        emitter.onError(e -> sseEmitter.remove(clientIdInt));
 
         try {
             emitter.send(SseEmitter.event().name("connect").data("연결 성공"));
@@ -41,8 +42,9 @@ public class NotificationService {
         return emitter;
     }
 
-    public void sendNotification(Integer clientId, NotificationRequest notificationRequest) {
-        SseEmitter emitter = sseEmitter.get(clientId);
+    public void sendNotification(Long clientId, NotificationRequest notificationRequest) {
+        Integer clientIdInt = clientId.intValue();
+        SseEmitter emitter = sseEmitter.get(clientIdInt);
 
         if (emitter != null) {
             try {
@@ -51,7 +53,7 @@ public class NotificationService {
                         .data(notificationRequest));
             }
             catch (IOException e) {
-                sseEmitter.remove(clientId);
+                sseEmitter.remove(clientIdInt);
                 emitter.completeWithError(e);
             }
         }
