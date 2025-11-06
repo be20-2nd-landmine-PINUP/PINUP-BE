@@ -1,1 +1,1 @@
-![pin-up_logo.png](attachment:9af8dcf9-c846-4117-a58a-3c025889f945:pin-up_logo.png)
+<img width="1536" height="1024" alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
