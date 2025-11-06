@@ -74,9 +74,13 @@ public class SecurityConfig{
         };
     }
 
+    /*
+    * sse 연결 수립 테스트를 위해 임시로 /sse/** 경로는 filterchain을 우회하도록 설정함
+    * 추후 삭제 예정
+    */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/notifications/**");
+        return (web) -> web.ignoring().requestMatchers("/sse/**");
     }
 
 }

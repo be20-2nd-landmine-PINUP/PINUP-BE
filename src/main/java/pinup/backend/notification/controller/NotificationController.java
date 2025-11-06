@@ -13,9 +13,8 @@ import pinup.backend.notification.service.NotificationService;
 import java.util.concurrent.Executors;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/sse")
 @RequiredArgsConstructor
-@PermitAll
 public class NotificationController {
     private final NotificationService notificationService;
 
