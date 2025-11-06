@@ -12,5 +12,5 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     @Modifying
     @Query(value = "UPDATE feed SET like_count = like_count + 1 WHERE feed_id = :feedId", nativeQuery = true)
-    int incrementLikeCount(@Param("feedId") Long feedId);
+    Integer incrementLikeCount(@Param("feedId") Long feedId);
 }

@@ -19,7 +19,7 @@ public class FeedLikeCommandController {
     @PostMapping
     public ApiResponse<FeedLikeCommandService.LikeResult> like(
             @PathVariable Long feedId,
-            @RequestParam Long userId // 임시: 세션/Principal로 대체 예정
+            @RequestParam Long userId // TODO: 세션/Principal로 대체 예정
     ) {
         var result = likeService.like(feedId, userId);
         return ApiResponse.success(result, "좋아요 성공");
