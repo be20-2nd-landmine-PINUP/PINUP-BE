@@ -26,7 +26,8 @@ public class SecurityConfig{
         http
                 .csrf(csrf -> csrf.disable()) // 개발 중이라면 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 // 사용자: OAuth2 로그인
