@@ -42,8 +42,6 @@ public class RankingCommandController {
         return ResponseEntity.accepted().body(body);
     }
 
-
-
     // YM(연월)값 형식과 범위 검증한느 유틸리티 메서드
     private static void validateYm(String ym) {
         //NULL이거나 "YYYY-MM" 형태가 아닐 경우 예외 발생.

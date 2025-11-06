@@ -1,6 +1,5 @@
 package pinup.backend.ranking;
 
-// src/test/java/.../RankingQueryServiceMyRankSimpleTest.java
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -8,9 +7,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import pinup.backend.ranking.query.dto.MyRankResponse;
 import pinup.backend.ranking.query.service.RankingQueryService;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
+
 
 class RankingQueryServiceMyRankSimpleTest {
 
@@ -27,7 +25,8 @@ class RankingQueryServiceMyRankSimpleTest {
 
         // completed 조회: 0 반환
         Mockito.when(jdbc.query(
-                ArgumentMatchers.startsWith("SELECT COUNT(DISTINCT t.region_code)"),
+                // ✅ region_id로 변경 + 앞 공백 대비해 contains 사용
+                ArgumentMatchers.contains("SELECT COUNT(DISTINCT t.region_id)"),
                 ArgumentMatchers.anyMap(),
                 ArgumentMatchers.<RowMapper<Integer>>any()
         )).thenReturn(java.util.List.of(0));
@@ -51,7 +50,8 @@ class RankingQueryServiceMyRankSimpleTest {
         )).thenReturn(java.util.Collections.emptyList());
 
         Mockito.when(jdbc.query(
-                ArgumentMatchers.startsWith("SELECT COUNT(DISTINCT t.region_code)"),
+                // ✅ region_id + contains
+                ArgumentMatchers.contains("SELECT COUNT(DISTINCT t.region_id)"),
                 ArgumentMatchers.anyMap(),
                 ArgumentMatchers.<RowMapper<Integer>>any()
         )).thenReturn(java.util.List.of(3));
@@ -59,7 +59,7 @@ class RankingQueryServiceMyRankSimpleTest {
         RankingQueryService svc = new RankingQueryService(jdbc);
         MyRankResponse r = svc.getMyRank("2025-10", 42L);
 
-        // ✅ 여기서 콘솔 출력
+        // (디버그 로그는 원하면 유지)
         System.out.println("=== 테스트 실행 ===");
         System.out.println("UserId: " + 42L);
         System.out.println("Rank: " + r.getRank());
@@ -85,7 +85,8 @@ class RankingQueryServiceMyRankSimpleTest {
 
         // completed 조회: 2개라고 가정
         Mockito.when(jdbc.query(
-                ArgumentMatchers.startsWith("SELECT COUNT(DISTINCT t.region_code)"),
+                // ✅ region_id + contains
+                ArgumentMatchers.contains("SELECT COUNT(DISTINCT t.region_id)"),
                 ArgumentMatchers.anyMap(),
                 ArgumentMatchers.<RowMapper<Integer>>any()
         )).thenReturn(java.util.List.of(2));
@@ -97,5 +98,4 @@ class RankingQueryServiceMyRankSimpleTest {
         assertThat(r.getCompletedCount()).isEqualTo(2);
         assertThat(r.getMessage()).isNull();
     }
-
 }
