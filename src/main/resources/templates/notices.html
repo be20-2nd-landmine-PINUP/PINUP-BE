@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 목록 | PIN-UP Admin</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #c3ec52, #0ba29d);
+            color: #333;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 40px;
+            width: 900px;
+        }
+        .logo {
+            width: 130px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 26px;
+            color: #222;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        th {
+            background-color: #f1f2f6;
+            color: #555;
+        }
+        tr:hover {
+            background-color: #f5f6fa;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .create-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .create-btn:hover {
+            background-color: #388E3C;
+        }
+        .back-btn {
+            background-color: #0ba29d;
+            color: white;
+        }
+        .back-btn:hover {
+            background-color: #08857f;
+        }
+        .empty {
+            color: #999;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img th:src="@{/images/pinup_logo.png}" alt="PIN-UP 로고" class="logo">
+    <h1>📢 공지사항 목록</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="notice, stat : ${noticeList}">
+            <td th:text="${stat.count}">1</td>
+            <td>
+                <a th:href="@{'/admin/notice/' + ${notice.noticeId}}"
+                   th:text="${notice.noticeTitle}"
+                   style="color:#0ba29d; text-decoration:none; font-weight:500;">
+                    공지사항 제목
+                </a>
+            </td>
+            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2025-11-06</td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(noticeList)}">
+            <td colspan="3" class="empty">등록된 공지사항이 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 30px;">
+        <a href="/admin/notice/create" class="btn create-btn">새 공지 등록</a>
+        <a href="/admin/home" class="btn back-btn">대시보드로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>
