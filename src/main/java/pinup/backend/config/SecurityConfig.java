@@ -29,7 +29,7 @@ public class SecurityConfig{
         http
                 .csrf(csrf -> csrf.disable()) // 개발 중이라면 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/admin/**")
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream", "/admin/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
