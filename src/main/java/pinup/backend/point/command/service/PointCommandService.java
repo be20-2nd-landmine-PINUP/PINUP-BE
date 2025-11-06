@@ -1,5 +1,6 @@
 package pinup.backend.point.command.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,17 @@ import java.time.*; // LocalDate, LocalDateTime, ZoneId 등
 
 @Service
 public class PointCommandService {
+    // ===================== 상수 (정책/키 Prefix) =====================
+    private static final int LIKE_POINT = 5;
+    private static final int MONTHLY_BONUS_POINT = 10;
+
+    private static final String PREFIX_LIKE = "LIKE";
+    private static final String PREFIX_CAPTURE = "CAPTURE";
+    private static final String PREFIX_STORE = "STORE";
+    private static final String PREFIX_MONTHLY_BONUS_D3 = "MONTHLY_BONUS_D3";
+
+    private static final String LOCK_PREFIX = "points";
+
 
     private final PointLogRepository pointLogRepository;
     private final TotalPointRepository totalPointRepository;
@@ -37,17 +49,19 @@ public class PointCommandService {
        ============================================ */
     @Transactional
     public void grantLike(Long userId, Long feedId) {
-        if (exists(userId, PointLog.SourceType.LIKE, feedId)) return;  // 이미 있으면 중복 방지
+        String eventKey = likeKey(userId, feedId);
+        if (pointLogRepository.existsByEventKey(eventKey)) return;
 
-        String lockKey = buildLockKey(userId, PointLog.SourceType.LIKE, feedId);
+        String lockKey = lockKey(PREFIX_LIKE, userId, feedId);
         if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            if (exists(userId, PointLog.SourceType.LIKE, feedId)) return;
+            if (pointLogRepository.existsByEventKey(eventKey)) return;
 
-            int value = 5; // 좋아요는 무조건 5점
-            pointLogRepository.save(new PointLog(userId, feedId, PointLog.SourceType.LIKE, value));
-            totalPointRepository.upsertAdd(userId, value);
+            // 좋아요는 무조건 5점
+            PointLog log = PointLog.like(userId, feedId, LIKE_POINT);
+            saveIdempotent(log, eventKey); // 유니크 충돌 무시
+            totalPointRepository.upsertAdd(userId, LIKE_POINT);
         } finally {
             releaseLock(lockKey);
         }
@@ -58,111 +72,129 @@ public class PointCommandService {
        ============================================ */
     @Transactional
     public void grantCapture(Long userId, Long territoryId) {
-        if (exists(userId, PointLog.SourceType.CAPTURE, territoryId)) return; // 멱등
+        String eventKey = captureKey(userId, territoryId);
+        if (pointLogRepository.existsByEventKey(eventKey)) return;
 
-        String lockKey = buildLockKey(userId, PointLog.SourceType.CAPTURE, territoryId);
+        String lockKey = lockKey(PREFIX_CAPTURE, userId, territoryId);
         if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            if (exists(userId, PointLog.SourceType.CAPTURE, territoryId)) return;
+            if (pointLogRepository.existsByEventKey(eventKey)) return;
             // 영토의 행정구역 이름(region_depth3)을 db에서 가져옴
-            String depth3 = jdbc.queryForObject(
-                    "SELECT region_depth3 FROM territory WHERE territory_id = ?",
-                    String.class, territoryId
+            String depth3 = jdbc.queryForObject("""
+                SELECT r.region_depth3
+                FROM territory t
+                JOIN region r ON r.region_id = t.region_id
+                WHERE t.territory_id = ?
+                """, String.class, territoryId
             );
             int value = calcCapturePoint(depth3); // 점수 계산
 
-            pointLogRepository.save(new PointLog(userId, territoryId, PointLog.SourceType.CAPTURE, value));
-            totalPointRepository.upsertAdd(userId, value);
+            PointLog log = PointLog.capture(userId, territoryId, value);
+            saveIdempotent(log, eventKey);
+            if (value != 0) {
+                totalPointRepository.upsertAdd(userId, value);
+            }
         } finally {
             releaseLock(lockKey);
         }
     }
-    // 행정 구역에 따른 점수 계산 로직
-    private int calcCapturePoint(String d3) {
-        if (d3 == null) return 0;
-        d3 = d3.trim();
-        if (d3.endsWith("읍") || d3.endsWith("면")) return 10; // 읍, 면이면 +10점
-        if (d3.endsWith("동")) return 5; // 동이면 5점
-        return 0; // 그 외는 점수 없음
-    }
+
 
     /* ============================================
        포인트 차감 (STORE)
        ============================================ */
     @Transactional
     public void use(Long userId, int value, Long sourceId) {
-        if (exists(userId, PointLog.SourceType.STORE, sourceId)) return; // 멱등
+        String eventkey = storeKey(userId, sourceId);
+        if (pointLogRepository.existsByEventKey(eventkey)) return;
 
-        String lockKey = buildLockKey(userId, PointLog.SourceType.STORE, sourceId);
+        String lockKey = lockKey(PREFIX_STORE, userId, sourceId);
         if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
 
         try {
-            if (exists(userId, PointLog.SourceType.STORE, sourceId)) return;
+            if (pointLogRepository.existsByEventKey(eventkey)) return;
 
             int affected = totalPointRepository.trySubtract(userId, value);
             if (affected == 0)
                 throw new IllegalStateException("포인트 부족");
 
-            pointLogRepository.save(new PointLog(userId, sourceId, PointLog.SourceType.STORE, -value));
+            PointLog log = PointLog.storeUse(userId, sourceId, -value);
+            saveIdempotent(log, eventkey);
         } finally {
             releaseLock(lockKey);
         }
     }
 
-    // 보너스 전용 메서드
-    //monthlyKey는 YYYYMM(예: 202510) 그대로 point_log.point_source_id에 들어갑니다.
+    /* =========================================================
+      월 보너스 (MONTHLY_BONUS)
+      - yearMonth = YYYYMM (예: 202510)
+      - event_key: event_key = "MONTHLY_BONUS:{userId}:{territoryId}:{YYYYMM}"
+      - point_source_id = (d1|d2|d3).hashCode() & 0x7fffffff (INT 안전 범위)
+      - 과거의 음수 point_source_id/월 범위 조회 방식은 폐기
+      ========================================================= */
     @Transactional
-    public void grantMonthlyBonus(Long userId, Long territoryId, long monthlyKey) {
-        // 월 구간 계산 (Asia/Seoul)
-        ZoneId zone = ZoneId.of("Asia/Seoul");
-        int year = (int) (monthlyKey / 100);
-        int month = (int) (monthlyKey % 100);
-        LocalDateTime from = LocalDate.of(year, month, 1).atStartOfDay(zone).toLocalDateTime();
-        LocalDateTime to   = LocalDate.of(year, month, 1).plusMonths(1).atStartOfDay(zone).toLocalDateTime();
+    public void grantMonthlyBonusByDepth3(Long userId, String d1, String d2, String d3, int yearMonth) {
+        String sig = normalizeDepths(d1, d2, d3); // "d1|d2|d3"
+        String eventKey = monthlyBonusD3Key(userId, sig, yearMonth);
+        if (pointLogRepository.existsByEventKey(eventKey)) return;
 
-        // 보너스 구분용: point_source_id = -territoryId  (INT DDL과 충돌 없음)
-        int bonusSourceId = Math.toIntExact(-territoryId);
-
-        // 멱등: 같은 달에 같은 영토 보너스가 이미 있으면 스킵
-        if (existsBonusThisMonth(userId, bonusSourceId, from, to)) return;
-
-        String lockKey = buildLockKey("BONUS", userId, territoryId, monthlyKey);
+        String lockKey = lockKey(PREFIX_MONTHLY_BONUS_D3, userId, sig, yearMonth);
         if (!acquireLock(lockKey, 5)) throw new IllegalStateException("잠금 획득 실패");
-
         try {
-            if (existsBonusThisMonth(userId, bonusSourceId, from, to)) return;
+            if (pointLogRepository.existsByEventKey(eventKey)) return;
 
-            int value = 10; // 보너스 고정 +10
-            pointLogRepository.save(new PointLog(
+            int sourceId = positiveHash(sig);
+            PointLog log = new PointLog(
                     userId,
-                    (long) bonusSourceId,               // 음수 territoryId
-                    PointLog.SourceType.CAPTURE,       // DDL 제약상 CAPTURE로 저장
-                    value
-            ));
-            totalPointRepository.upsertAdd(userId, value);
+                    (long) sourceId,                          // INT 범위 내 식별자
+                    PointLog.SourceType.MONTHLY_BONUS,
+                    eventKey,
+                    MONTHLY_BONUS_POINT
+            );
+            saveIdempotent(log, eventKey);
+            totalPointRepository.upsertAdd(userId, MONTHLY_BONUS_POINT);
         } finally {
             releaseLock(lockKey);
         }
     }
-    private boolean existsBonusThisMonth(Long userId, int bonusSourceId,
-                                         LocalDateTime from, LocalDateTime to) {
-        Integer cnt = jdbc.queryForObject("""
-        SELECT COUNT(*) FROM point_log
-         WHERE user_id = ?
-           AND source_type = 'CAPTURE'
-           AND point_source_id = ?
-           AND created_at >= ?
-           AND created_at <  ?
-    """, Integer.class, userId, bonusSourceId, from, to);
-        return cnt != null && cnt > 0;
+
+
+
+    /* ===================== 유틸/헬퍼 ===================== */
+
+    // 유니크(event_key) 충돌 시 멱등 처리로 간주하고 무시
+    private void saveIdempotent(PointLog log, String eventKey) {
+        try {
+            pointLogRepository.save(log);
+        } catch (DataIntegrityViolationException e) {
+            // 정말 같은 키로 이미 있는지 확인 (다른 제약 위반이면 다시 던짐)
+            if (!pointLogRepository.existsByEventKey(eventKey)) throw e;
+        }
     }
 
-
-    private String buildLockKey(String kind, Long userId, Long territoryId, long monthlyKey) {
-        return "points:%s:%s:%s:%s".formatted(kind, userId, territoryId, monthlyKey);
+    // 행정 구역에 따른 점수 계산 로직
+    private int calcCapturePoint(String d3) {
+        if (d3 == null) return 0;
+        String s = d3.trim();
+        if (s.endsWith("읍") || s.endsWith("면")) return 10;
+        if (s.endsWith("동")) return 5;
+        return 0;
+    }
+    // 월 경계가 필요한 다른 로직에서 쓸 수 있도록 도우미(지금은 미사용)
+    @SuppressWarnings("unused")
+    private LocalDateTime[] monthRangeKst(int yearMonth) {
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        int y = yearMonth / 100;
+        int m = yearMonth % 100;
+        LocalDateTime from = LocalDate.of(y, m, 1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime to = from.plusMonths(1);
+        return new LocalDateTime[]{from, to};
     }
 
+    // --------------------- MySQL 분산락 ---------------------
+
+    // 분산락(GET_LOCK/RELEASE_LOCK)
     private boolean acquireLock(String key, int timeoutSec) {
         Integer r = jdbc.queryForObject("SELECT GET_LOCK(?, ?)", Integer.class, key, timeoutSec);
         return r != null && r == 1;
@@ -171,14 +203,45 @@ public class PointCommandService {
     private void releaseLock(String key) {
         jdbc.queryForObject("SELECT RELEASE_LOCK(?)", Integer.class, key);
     }
+    // --------------------- 키 생성 (상수 기반) ---------------------
 
-    // 추가 ⬇️
-    private String buildLockKey(Long userId, PointLog.SourceType type, Long sourceId) {
-        return "points:%s:%s:%s".formatted(type.name(), userId, sourceId);
+    // event_key 생성 규칙(일관성)
+    private String likeKey(Long userId, Long feedId) {
+        return "LIKE:%d:%d".formatted(PREFIX_LIKE, userId, feedId);
     }
-    private boolean exists(Long userId, PointLog.SourceType type, Long sourceId) {
-        return pointLogRepository.existsByUserIdAndSourceTypeAndPointSourceId(userId, type, sourceId);
+
+    private String captureKey(Long userId, Long territoryId) {
+        return "CAPTURE:%d:%d".formatted(PREFIX_LIKE, userId, territoryId);
     }
+
+    private String storeKey(Long userId, Long sourceId) {
+        return "STORE:%d:%d".formatted(PREFIX_LIKE, userId, sourceId);
+    }
+
+    private String monthlyBonusD3Key(Long userId, String sig, int yearMonth) {
+        return "%s:%d:%s:%d".formatted(PREFIX_MONTHLY_BONUS_D3, userId, sig, yearMonth);
+    }
+
+    private String lockKey(String prefix, Long id1, Long id2) {
+        return "%s:%s:%d:%d".formatted(LOCK_PREFIX, prefix, id1, id2);
+    }
+
+    private String lockKey(String prefix, Long id1, String sig, int yearMonth) {
+        return "%s:%s:%d:%s:%d".formatted(LOCK_PREFIX, prefix, id1, sig, yearMonth);
+    }
+
+    private String normalizeDepths(String d1, String d2, String d3) {
+        String n1 = d1 == null ? "" : d1.trim();
+        String n2 = d2 == null ? "" : d2.trim();
+        String n3 = d3 == null ? "" : d3.trim();
+        return n1 + "|" + n2 + "|" + n3;
+    }
+
+    private int positiveHash(String s) {
+        return (s == null) ? 0 : (s.hashCode() & 0x7fffffff);
+    }
+
+
 
 
 }

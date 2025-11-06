@@ -1,5 +1,6 @@
 package pinup.backend.point.command.service;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,60 +28,93 @@ public class MonthlyBonusScheduler {
         this.clock = clock;
     }
 
+    // depth 조합을 담을 간단한 레코드(자바 16+)
+    private record Area(String d1, String d2, String d3) {}
+
     // 매월 1일 00:05 KST
     @Scheduled(cron = "${point.bonus.cron}", zone = "Asia/Seoul")
     public void grantMonthlyBonus() {
         ZoneId zone = ZoneId.of("Asia/Seoul");
         YearMonth targetYm = YearMonth.from(ZonedDateTime.now(clock).withZoneSameInstant(zone)).minusMonths(1);
-        long monthlyKey = targetYm.getYear() * 100L + targetYm.getMonthValue(); // 예: 202510
+        int yearMonth = targetYm.getYear() * 100 + targetYm.getMonthValue(); // 예: 202510
 
         Instant from = targetYm.atDay(1).atStartOfDay(zone).toInstant();
         Instant to   = targetYm.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant();
 
-        Long lastUserId = null;      // 키셋 페이징용
-        Long lastTerritoryId = null; // 키셋 페이징용
+        final String sqlAreas = """
+            SELECT r.region_depth1, r.region_depth2, r.region_depth3
+              FROM region r
+              JOIN territory t ON t.region_id = r.region_id
+              JOIN territory_visit_log v ON v.territory_id = t.territory_id
+             WHERE v.is_valid = TRUE
+               AND v.visited_at >= ?
+               AND v.visited_at <  ?
+             GROUP BY r.region_depth1, r.region_depth2, r.region_depth3
+            HAVING COUNT(*) <= 100
+             ORDER BY r.region_depth1, r.region_depth2, r.region_depth3
+             LIMIT ? OFFSET ?
+        """;
 
+        final String sqlUsers = """
+            SELECT DISTINCT v.user_id
+              FROM territory_visit_log v
+              JOIN territory t ON t.territory_id = v.territory_id
+              JOIN region r ON r.region_id = t.region_id
+             WHERE r.region_depth1 = ?
+               AND r.region_depth2 = ?
+               AND r.region_depth3 = ?
+               AND v.is_valid = TRUE
+               AND v.visited_at >= ?
+               AND v.visited_at <  ?
+               AND ( ? IS NULL OR v.user_id > ? )   -- 키셋 페이징
+             ORDER BY v.user_id
+             LIMIT ?
+        """;
+
+        int offset = 0;
         while (true) {
-            // 지난달 유효 방문 수 ≤ 100인 (user_id, territory_id) 페어를 키셋 페이징으로 조회
-            List<Pair<Long, Long>> rows = jdbc.query("""
-                SELECT t.user_id, t.territory_id
-                  FROM territory t
-                 WHERE (
-                    SELECT COUNT(*)
-                      FROM territory_visit_log v
-                     WHERE v.territory_id = t.territory_id
-                       AND v.is_valid = TRUE
-                       AND v.visited_at >= ?
-                       AND v.visited_at <  ?
-                 ) <= 100
-                   AND (
-                        ? IS NULL
-                        OR (t.user_id > ?)
-                        OR (t.user_id = ? AND t.territory_id > ?)
-                   )
-                 ORDER BY t.user_id, t.territory_id
-                 LIMIT ?
-            """, (rs, i) -> Pair.of(rs.getLong(1), rs.getLong(2)),
-                    from, to,
-                    lastUserId, lastUserId, lastUserId, lastTerritoryId,
-                    batchSize);
+            // 1) 지난달 방문 수 ≤ 100 인 (depth1, depth2, depth3) 목록 배치 조회
+            List<Area> areas = jdbc.query(
+                    sqlAreas,
+                    (rs, i) -> new Area(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3)
+                    ),
+                    from, to, batchSize, offset
+            );
 
-            if (rows.isEmpty()) break;
+            if (areas.isEmpty()) break;
+            offset += areas.size();
 
-            for (Pair<Long, Long> row : rows) {
-                Long userId = row.getLeft();
-                Long territoryId = row.getRight();
+            for (Area area : areas) {
+                String d1 = area.d1();
+                String d2 = area.d2();
+                String d3 = area.d3();
 
-                if (dryRun) {
-                    // 드라이런이면 로그만
-                    // log.info("DRY-RUN bonus target user={}, territory={}, month={}", userId, territoryId, monthlyKey);
-                } else {
-                    // B안: 영토당 월1회 부여
-                    pointService.grantMonthlyBonus(userId, territoryId, monthlyKey);
+                Long lastUserId = null; // 2) 사용자 키셋 페이징
+                while (true) {
+                    List<Long> userIds = jdbc.query(
+                            sqlUsers,
+                            (rs, i) -> rs.getLong(1),
+                            d1, d2, d3,
+                            from, to,
+                            lastUserId, lastUserId,
+                            batchSize
+                    );
+                    if (userIds.isEmpty()) break;
+
+                    for (Long userId : userIds) {
+                        if (dryRun) {
+                            // 필요시 실제 event_key 포맷으로 미리보기
+                            // log.info("DRY-RUN monthly bonus (d1/d2/d3) user={}, {}|{}|{}, yyyymm={}",
+                            //          userId, d1, d2, d3, yearMonth);
+                        } else {
+                            pointService.grantMonthlyBonusByDepth3(userId, d1, d2, d3, yearMonth);
+                        }
+                        lastUserId = userId;
+                    }
                 }
-
-                lastUserId = userId;
-                lastTerritoryId = territoryId;
             }
         }
     }
