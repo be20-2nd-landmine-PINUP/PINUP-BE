@@ -66,6 +66,8 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'org.hibernate.orm:hibernate-spatial:6.2.2.Final'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.3.0'
 }
 
 tasks.named('test') {
