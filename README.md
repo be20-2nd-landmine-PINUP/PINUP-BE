@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/23381964/README.md)
+[README.md](https://github.com/user-attachments/files/23382249/README.md)
 <img width="800"  alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
 
 ### 🧭 프로젝트 개요 (Overview)
@@ -12,7 +12,7 @@
 
 <br>
 
-## 💡 주요 목표
+### 💡 주요 목표
 
 - 국내 여행을 **데이터화 + 시각화**
 - 실제 방문 지역을 기반으로 **영토 확장 시스템** 구현
@@ -132,6 +132,9 @@
 <img width="1151" height="636" alt="Image" src="https://github.com/user-attachments/assets/2410224e-c427-4046-9dce-74ab9bb9310a" />
 
 ## 🔗 API 구조 (API Overview)
+
+
+<img width="734" height="852" alt="Image" src="https://github.com/user-attachments/assets/104da3f0-619e-4a9d-ae65-ad06ad149a6f" />
 
 ## 📁 폴더 구조 (Directory Structure)
 
