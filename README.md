@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/23381164/README.md)
+[README.md](https://github.com/user-attachments/files/23381964/README.md)
 <img width="800"  alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
 
 ### 🧭 프로젝트 개요 (Overview)
@@ -7,10 +7,18 @@
   
   
 <br>
-핀업(Pin-Up)은 사용자가 실제 방문한 지역을 **지도 위의 “영토”로 점령**하여 자신만의 여행 지도를 완성하고,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+핀업(Pin-Up)은 사용자가 실제 방문한 지역을 **지도 위의 “영토”로 점령**하여 자신만의 여행 지도를 완성하고,<br>
 랭킹을 통해 **다른 사용자와 “경쟁”할** 수 있는 새로운 형태의 **여행 기록 서비스**입니다.
 
 <br>
+
+## 💡 주요 목표
+
+- 국내 여행을 **데이터화 + 시각화**
+- 실제 방문 지역을 기반으로 **영토 확장 시스템** 구현
+- 게임 요소(랭킹, 성취)를 통해 지속적 서비스 이용 유도
+- 백엔드 중심으로 **API, 인증, 지도 데이터, 통계 처리** 경험 강화
+
 
 ## 👥 팀 구성 (Contributors)
 
@@ -96,7 +104,7 @@
 - 한정판, 이벤트 아이템 관리
 
 ## 🏗️ 프로젝트 아키텍처 (Architecture)
-
+<br>
 
 | 구분 | 사용 기술 |
 | --- | --- |
@@ -109,9 +117,48 @@
 
 ## 🧩 ERD 및 주요 도메인 (Domain & ERD)
 
+### 요구사항명세서
+<img width="1392" height="721" alt="Image" src="https://github.com/user-attachments/assets/c61aa2b7-18f1-4e8a-91ac-4a8b60e1a296" />
+
+<br>
+
+### DDD
+<img width="1040" height="871" alt="Image" src="https://github.com/user-attachments/assets/4001b209-5d7c-4f35-bdf0-a9cd8f80f20e" />
+
+<br>
+
+### ERD
+
+<img width="1151" height="636" alt="Image" src="https://github.com/user-attachments/assets/2410224e-c427-4046-9dce-74ab9bb9310a" />
+
 ## 🔗 API 구조 (API Overview)
 
 ## 📁 폴더 구조 (Directory Structure)
+
+📦 pinup-backend<br>
+┃ ┃ ┃ ┗ 📂 pinup <br>
+┃ ┃ ┃ ┃ ┗ 📂 backend <br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 auth # 인증 (JWT, 로그인/회원가입)<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 config # 전역 설정 (Security, CORS, Swagger 등)<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 conquer # 영토 점령 기능 (좌표, 지도 연동)<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 feed # 여행 피드 및 게시글 관리<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 home # 홈 화면 요약 데이터<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 member # 회원 관리 (프로필, 포인트, 활동 통계)<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 notice # 공지사항 관리<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 notification # 알림 기능<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 ranking # 랭킹 시스템<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 report # 리포트/통계 모듈<br>
+┃ ┃ ┃ ┃ ┃ ┣ 📂 store # 상점 및 인벤토리 아이템 관리<br>
+┃ ┃ ┃ ┃ ┃ ┗ 📜 PinupApplication.java<br>
+┃ ┃ ┣ 📂 resources<br>
+┃ ┃ ┃ ┣ 📂 mapper # MyBatis or Query Mapper (선택적)<br>
+┃ ┃ ┃ ┣ 📂 pinup # 프로젝트 리소스 (이미지, 아이콘 등)<br>
+┃ ┃ ┃ ┣ 📂 static # 정적 파일 (CSS, JS 등)<br>
+┃ ┃ ┃ ┣ 📂 templates # Thymeleaf 템플릿 (if used)<br>
+┃ ┃ ┃ ┣ 📜 application.yml # 환경 설정 파일<br>
+┃ ┃ ┃ ┣ 📜 dummy_feedtest.sql # 피드 테스트용 SQL 데이터<br>
+┃ ┃ ┃ ┗ 📜 dummy_regions.sql # 지역 더미 데이터<br>
+┃ ┗ 📂 test # 테스트 코드<br>
 
 ## 🚀 실행 및 테스트 방법 (Run & Test)
 
