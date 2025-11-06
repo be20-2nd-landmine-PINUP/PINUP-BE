@@ -30,7 +30,7 @@ public class PointLog {
     private LocalDateTime createdAt;
 
     public enum SourceType { CAPTURE, LIKE, STORE, MONTHLY_BONUS }
-/// STORE로 변경한 것 잘 반영된 것 맞는지?
+
     protected PointLog() {}
 
     public PointLog(Long userId, Long pointSourceId, SourceType sourceType, String eventKey, Integer pointValue) {

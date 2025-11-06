@@ -16,7 +16,6 @@ import java.time.*; // LocalDate, LocalDateTime, ZoneId 등
 
 
 // 포인트 적립, 차감하는 기능; 쓰기 전용
-// 중복 체크 -> named lock ->재확인 -> 처리
 
 @Service
 public class PointCommandService {
@@ -207,15 +206,15 @@ public class PointCommandService {
 
     // event_key 생성 규칙(일관성)
     private String likeKey(Long userId, Long feedId) {
-        return "LIKE:%d:%d".formatted(PREFIX_LIKE, userId, feedId);
+        return PREFIX_LIKE + ":" + userId + ":" + feedId;
     }
 
     private String captureKey(Long userId, Long territoryId) {
-        return "CAPTURE:%d:%d".formatted(PREFIX_LIKE, userId, territoryId);
+        return PREFIX_CAPTURE + ":" + userId + ":" + territoryId;
     }
 
     private String storeKey(Long userId, Long sourceId) {
-        return "STORE:%d:%d".formatted(PREFIX_LIKE, userId, sourceId);
+        return PREFIX_STORE + ":" + userId + ":" + sourceId;
     }
 
     private String monthlyBonusD3Key(Long userId, String sig, int yearMonth) {
@@ -245,12 +244,17 @@ public class PointCommandService {
 
 
 }
-
-
 /*
-목적
-1) 선조회로 대부분의 재요청을 빠르게 걸러냅니다.
-2) named lock으로 같은 비즈니스 키에 대한 동시 요청을 서버 전체에서 직렬화
-3) 잠금 구간에서 재확인 → 처리를 하므로 경쟁 상태를 제거합니다.
-4) 성공 후에는 기존 upsertAdd/trySubtract가 원자적으로 잔액을 바꿔 줍니다.
+PointCommandService는 포인트 적립/차감/보너스 지급을 안전하게 처리하는 핵심 로직으로,
+이벤트 키를 통한 멱등성, MySQL 락을 통한 동시성 제어, 그리고 단일 트랜잭션 내 안정적 포인트 갱신을 보장한다.
+=================
+이 서비스는 “포인트 적립/차감/월보너스 지급” 같은 쓰기(Command) 작업을 수행합니다.
+
+핵심 원칙은 두 가지:
+
+멱등성: event_key를 유니크로 관리 → 같은 이벤트는 한 번만 반영
+
+동시성 제어: MySQL GET_LOCK/RELEASE_LOCK으로 분산락 → 중복 처리/경합 방지
+
+총 포인트는 TotalPointRepository.upsertAdd(...) / trySubtract(...) 같은 원자적 집계 함수로 갱신합니다.
  */
