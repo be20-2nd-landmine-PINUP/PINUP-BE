@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pinup.backend.member.query.mapper.AdminMapper">
+
+    <!-- 전체 회원 수 (모든 사용자) -->
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+    </select>
+
+    <!-- 오늘 가입한 회원 수 -->
+    <select id="countNewUsersToday" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE DATE(created_at) = CURDATE()
+    </select>
+
+</mapper>
