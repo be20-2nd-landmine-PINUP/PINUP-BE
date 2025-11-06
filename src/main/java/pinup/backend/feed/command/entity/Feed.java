@@ -52,6 +52,7 @@ public class Feed {
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
+        this.likeCount = 0;
     }
 
     // 피드 수정 간 사용할 메소드
@@ -59,9 +60,5 @@ public class Feed {
         if (title != null && !title.isBlank()) this.title = title;
         if (content != null && !content.isBlank()) this.content = content;
         if (imageUrl != null && !imageUrl.isBlank()) this.imageUrl = imageUrl;
-    }
-
-    public void increaseLikeCount() {
-        likeCount += 1;
     }
 }
