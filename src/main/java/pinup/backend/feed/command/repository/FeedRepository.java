@@ -9,8 +9,7 @@ import pinup.backend.feed.command.entity.Feed;
 
 @Repository
 public interface FeedRepository extends JpaRepository<Feed, Long> {
-
-    @Modifying
-    @Query(value = "UPDATE feed SET like_count = like_count + 1 WHERE feed_id = :feedId", nativeQuery = true)
-    Integer incrementLikeCount(@Param("feedId") Long feedId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "UPDATE feed SET like_count = COALESCE(like_count,0) + 1 WHERE feed_id = :feedId", nativeQuery = true)
+    int incrementLikeCount(@Param("feedId") Long feedId);
 }

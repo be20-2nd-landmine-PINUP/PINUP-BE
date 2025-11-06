@@ -1,6 +1,7 @@
 package pinup.backend.feed.command.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.feed.command.entity.Feed;
@@ -23,12 +24,12 @@ public class FeedLikeCommandService {
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final UserRepository userRepository;
-    // private final PointLogRepository pointLogRepository;
-    // private final TotalPointRepository totalPointRepository;
+    // private final {실제 쓸 포인트 이력 리포지토리}
+    // private final {실제 쓸 포인트 지갑 리포지토리};
 
     public record LikeResult(boolean liked, long likeCount) {}
 
-    public LikeResult like(Long feedId, Long userId) throws DuplicateLikeException {
+    public LikeResult like(Long feedId, Long userId) {
         // 존재 확인
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedNotFoundException(feedId));
@@ -54,18 +55,18 @@ public class FeedLikeCommandService {
 
             // 카운트 증가
             feedRepository.incrementLikeCount(feedId);
-
+            /*
             // 포인트 지급 (피드 작성자에게) — 최초 성공시에만
             Long authorId = feed.getUserId().getUserId();
-            pointLogRepository.insertLikePoint(authorId, feedId, POINT_PER_LIKE);
-            totalPointRepository.increment(authorId, POINT_PER_LIKE);
 
+            {실제 쓸 포인트 이력 리포지토리} 증가 메소드 (authorId, feedId, POINT_PER_LIKE);
+            {실제 쓸 포인트 지갑 리포지토리} 증가 메소드 (authorId, POINT_PER_LIKE);
+            */
         } catch (DataIntegrityViolationException e) {
-            // 경합으로 중복 insert 발생 → 중복 좋아요로 간주
+            // 중복 insert 발생 → 중복 좋아요로 간주
             throw new DuplicateLikeException(feedId, userId);
         }
 
-        long cnt = feedLikeRepository.countByFeedLikeId_FeedId(feedId);
-        return new LikeResult(true, cnt);
+        return new LikeResult(true, feed.getLikeCount());
     }
 }
