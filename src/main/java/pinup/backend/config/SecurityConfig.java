@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,9 +14,11 @@ import pinup.backend.auth.command.service.CustomAdminDetailsService;
 import pinup.backend.auth.command.service.CustomOAuth2UserService;
 import pinup.backend.member.command.domain.Admin;
 import pinup.backend.member.command.repository.AdminRepository;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig{
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -26,6 +29,16 @@ public class SecurityConfig{
         http
                 .csrf(csrf -> csrf.disable()) // 개발 중이라면 비활성화
                 .authorizeHttpRequests(auth -> auth
+                            // ===== API 권한  =====
+                        // /api/points/grant/like → 피드 역할(FEED)만 접근 가능
+                        .requestMatchers(HttpMethod.POST, "/api/points/grant/like").hasRole("FEED")
+                        // /api/points/grant/capture → 점령 역할(CAPTURE)만 접근 가능
+                        .requestMatchers(HttpMethod.POST, "/api/points/grant/capture").hasRole("CAPTURE")
+                        // /api/points/use → 매장(STORE) 역할만 접근 가능
+                        .requestMatchers(HttpMethod.POST, "/api/points/use").hasRole("STORE")
+                        // 포인트 조회(/api/points/**)는 로그인 사용자면 모두 가능
+                        .requestMatchers(HttpMethod.GET,  "/api/points/**").authenticated()
+
                         .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream")
                         .permitAll()
                         .anyRequest().authenticated()

@@ -3,6 +3,8 @@ package pinup.backend.feed.query.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pinup.backend.feed.command.entity.Feed;
+import pinup.backend.feed.common.exception.FeedNotFoundException;
 import pinup.backend.feed.query.dto.FeedCardDto;
 import pinup.backend.feed.query.dto.FeedQueryDto;
 import pinup.backend.feed.query.dto.SliceResponse;
@@ -45,10 +47,10 @@ public class FeedQueryService {
         return new SliceResponse<>(rows, nextCursor, hasNext);
     }
 
-    public FeedQueryDto getDetail(Long id) {
-        FeedQueryDto dto = feedQueryMapper.selectFeedDetail(id);
+    public FeedQueryDto getDetail(Long feedId) {
+        FeedQueryDto dto = feedQueryMapper.selectFeedDetail(feedId);
         if (dto == null) {
-            throw new IllegalArgumentException("존재하지 않는 피드입니다. id=" + id);
+            throw new FeedNotFoundException(feedId);
         }
         return dto;
     }

@@ -35,6 +35,9 @@ public class Feed {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "like_count")
+    private Integer likeCount;
+
     @CreationTimestamp      // 생성 시 자동 기입 예정
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -49,6 +52,7 @@ public class Feed {
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
+        this.likeCount = 0;
     }
 
     // 피드 수정 간 사용할 메소드
