@@ -37,36 +37,31 @@ public class RankingQueryService {
 
         String sql = """
             WITH counts AS (
-                SELECT
-                  t.user_id,
-                  COUNT(DISTINCT t.region_code) AS completed_count
-                FROM territory t
-                JOIN users u ON u.user_id = t.user_id AND u.status = 'ACTIVE'
-                WHERE t.capture_end_at >= :start
-                  AND t.capture_end_at  < :end
-                  AND EXISTS (
-                    SELECT 1 FROM territory_visit_log v
-                    WHERE v.territory_id = t.territory_id
-                      AND v.is_valid = TRUE
-                  )
-                GROUP BY t.user_id
-            )
             SELECT
-              r.rank         AS rank,
-              r.user_id      AS user_id,
-              u.user_name    AS user_name,
-              COALESCE(c.completed_count, 0) AS completed_count
-            FROM ranking r
-            JOIN users u   ON u.user_id = r.user_id AND u.status = 'ACTIVE'
-            LEFT JOIN counts c ON c.user_id = r.user_id
-            WHERE r.year = :year AND r.month = :month
-            ORDER BY r.rank ASC, r.user_id ASC
-            LIMIT 100
-            """;
+              t.user_id,
+              COUNT(DISTINCT t.region_id) AS completed_count
+            FROM territory t
+            JOIN users u ON u.user_id = t.user_id AND u.status = 'ACTIVE'
+            WHERE t.capture_end_at IS NOT NULL               -- 완료 기준 명시
+            WHERE t.capture_end_at >= :start
+              AND t.capture_end_at  < :end
+            GROUP BY t.user_id
+        )
+        SELECT
+          r.rank         AS rank,
+          r.user_id      AS user_id,
+          u.user_name    AS user_name,
+          COALESCE(c.completed_count, 0) AS completed_count
+        FROM ranking r
+        JOIN users u   ON u.user_id = r.user_id AND u.status = 'ACTIVE'
+        LEFT JOIN counts c ON c.user_id = r.user_id
+        WHERE r.year = :year AND r.month = :month
+        ORDER BY r.rank ASC, r.user_id ASC
+        LIMIT 100
+        """;
 
         Map<String, Object> params = Map.of(
-                "start", Timestamp.valueOf(start),
-                "end",   Timestamp.valueOf(end),
+                "start", Timestamp.valueOf(start), "end",   Timestamp.valueOf(end),
                 "year",  y.getYear(),
                 "month", y.getMonthValue()
         );
@@ -77,7 +72,7 @@ public class RankingQueryService {
                 .userName(rs.getString("user_name"))
                 .completedCount(rs.getInt("completed_count"))
                 .build());
-    }
+        }
 
     /** 캐시 무효화 (Command 완료 후 호출) */
     @CacheEvict(cacheNames = "rankingTop100", key = "#ym")
@@ -92,27 +87,23 @@ public class RankingQueryService {
         LocalDateTime start = y.atDay(1).atStartOfDay(zone).toLocalDateTime();
         LocalDateTime end = y.plusMonths(1).atDay(1).atStartOfDay(zone).toLocalDateTime();
 
-        // rank 읽기
+        // 1) Top100 내 랭크(있으면 그대로 반환)
         Integer rank = jdbc.query(
                 "SELECT r.rank FROM ranking r WHERE r.year=:year AND r.month=:month AND r.user_id=:uid",
                 Map.of("year", y.getYear(), "month", y.getMonthValue(), "uid", userId),
                 (rs, rn) -> rs.getInt("rank")
         ).stream().findFirst().orElse(null);
 
-        // completed_count 계산
+        // 2) 표시용 완료 수 (Command와 동일 기준: visit_log 조건 제거, DISTINCT region_id)
         Integer completed = jdbc.query(
                 """
-                SELECT COUNT(DISTINCT t.region_code) AS cnt
+                SELECT COUNT(DISTINCT t.region_id) AS cnt
                 FROM territory t
                 JOIN users u ON u.user_id = t.user_id AND u.status = 'ACTIVE'
                 WHERE t.user_id = :uid
+                  AND t.capture_end_at IS NOT NULL              -- 완료 기준 명시
                   AND t.capture_end_at >= :start
                   AND t.capture_end_at  < :end
-                  AND EXISTS (
-                    SELECT 1 FROM territory_visit_log v
-                    WHERE v.territory_id = t.territory_id
-                      AND v.is_valid = TRUE
-                  )
                 """,
                 Map.of("uid", userId,
                         "start", Timestamp.valueOf(start),
@@ -120,7 +111,6 @@ public class RankingQueryService {
                 (rs, rn) -> rs.getInt("cnt")
         ).stream().findFirst().orElse(0);
 
-        // RankingQueryService.getMyRank(...)
         if (rank == null) {
             if (completed == 0) {
                 return MyRankResponse.builder()
@@ -136,23 +126,11 @@ public class RankingQueryService {
                         .build();
             }
         }
-
-// (rank != null) 케이스
+        // (rank != null) 케이스
         return MyRankResponse.builder()
                 .rank(rank)
                 .completedCount(completed)
-                .message(null)    // TOP100 안이므로 메시지 없음
+                .message(null)
                 .build();
-
     }
 }
-
-/*
-목적: “월간 랭킹 데이터를 캐싱하며 빠르게 조회”하는 역할을 하고,
-“내 순위 조회는 항상 최신값을 DB에서 가져오는 구조”
-
-JSON 응답 예시
-{ "rank": 12, "completedCount": 35 }
-{ "rank": 150, "completedCount": 20, "message": "순위권 밖에 있습니다." }
-{ "completedCount": 0, "message": "해당 월 점령 완료 기록이 없습니다." }
- */
