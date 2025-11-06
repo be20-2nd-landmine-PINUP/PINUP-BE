@@ -20,4 +20,4 @@ public class StoreResponseDto {
     private String imageUrl;
     private Boolean isActive;
     private String regionName;
-}
+    }

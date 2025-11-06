@@ -7,19 +7,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pinup.backend.member.command.domain.Users;
-import pinup.backend.store.command.domain.Store;
-import pinup.backend.store.command.domain.StoreItemCategory;
+import pinup.backend.store.command.domain.*;
 import pinup.backend.store.command.repository.StoreRepository;
 import pinup.backend.store.command.service.InventoryService;
 import pinup.backend.store.command.service.StoreService;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class StoreServiceTest {
+class StoreServiceTest {
 
     @Mock
     private StoreRepository storeRepository;
@@ -30,47 +29,53 @@ public class StoreServiceTest {
     @InjectMocks
     private StoreService storeService;
 
-    private Store testItem;
     private Users testUser;
+    private Store testItem;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
         testUser = new Users();
+        testUser.setUserId(1L);
+        testUser.setNickname("tester");
+
         testItem = Store.builder()
                 .itemId(1)
                 .name("한정판 배경")
                 .description("서울 지역 한정판 아이템")
                 .price(100)
                 .category(StoreItemCategory.BUILDING)
+                .limitType(StoreLimitType.LIMITED)
                 .imageUrl("image.png")
                 .isActive(true)
                 .build();
     }
 
     @Test
-    @DisplayName("판매 중인 아이템 전체 조회 성공")
-    void getActiveItems() {
-        when(storeRepository.findAllByIsActiveTrue()).thenReturn(List.of(testItem));
+    @DisplayName("판매 중인 아이템 단일 조회 성공")
+    void getItemById() {
+        when(storeRepository.findById(1)).thenReturn(Optional.of(testItem));
 
-        List<Store> result = storeService.getActiveItems();
+        Store result = storeService.purchaseItem(testUser, 1).getStore();
 
-        assertThat(result.get(0).getName()).isEqualTo("한정판 배경");
-        verify(storeRepository, times(1)).findAllByIsActiveTrue();
+        verify(inventoryService, times(1)).validateOwnedItem(any(Users.class), any(Store.class));
+        assertThat(result.getName()).isEqualTo("한정판 배경");
     }
 
     @Test
-    @DisplayName("단일 아이템 상세 조회 성공")
-    void getItemById() {
+    @DisplayName("아이템 구매 시 인벤토리 등록 성공")
+    void purchaseItem_addToInventory() {
         when(storeRepository.findById(1)).thenReturn(Optional.of(testItem));
-        {
 
-            Store result = storeService.getItemById(1);
+        Inventory fakeInventory = Inventory.create(testUser, testItem);
+        when(inventoryService.addToInventory(any(Users.class), any(Store.class)))
+                .thenReturn(fakeInventory);
 
-            assertThat(result.getDescription()).contains("서울 지역");
-            verify(storeRepository, times(1)).findById(1);
+        Inventory result = storeService.purchaseItem(testUser, 1);
 
-
-        }
+        verify(inventoryService, times(1)).validateOwnedItem(testUser, testItem);
+        verify(inventoryService, times(1)).addToInventory(testUser, testItem);
+        assertThat(result.getStore().getName()).isEqualTo("한정판 배경");
     }
 }

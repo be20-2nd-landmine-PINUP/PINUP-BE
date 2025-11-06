@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.MemberCommandRepository;
 import pinup.backend.member.command.repository.UserRepository;
+import pinup.backend.notification.dto.NotificationRequest;
+import pinup.backend.notification.service.NotificationService;
 
 import java.security.Principal;
 
@@ -16,12 +18,22 @@ public class UserCommandService {
 
     private final UserRepository userRepository;
     private final MemberCommandRepository memberCommandRepository;
+    private final NotificationService notificationService; // 알림 주입
 
     // 회원 정지
     public void suspendUser(Long id) {
         Users user = memberCommandRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-        user.suspend(); // Users 엔티티에 정의된 메서드
+        // 회원 상태 변경
+        user.suspend();
+
+        // SSE 알림 전송
+        notificationService.sendNotification(id, NotificationRequest.builder()
+                .senderId(null)
+                .receiverId(id)
+                .notificationType(NotificationRequest.NotificationType.SUSPEND)
+                .notificationMessage("당신은 활동 정지 되었습니다.")
+                .build()); // sendNotification(보낼 유저 id, 메시지 내용 dto)
     }
 
     // 회원 활성화

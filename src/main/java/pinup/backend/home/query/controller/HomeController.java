@@ -22,9 +22,10 @@ public class HomeController {
     public String home(@AuthenticationPrincipal OAuth2User oAuth2User, Model model) {
         if (oAuth2User != null) {
             model.addAttribute("user", oAuth2User.getAttributes());
+        } else {
+            model.addAttribute("user", null);
         }
-        return "home"; // templates/home.html 렌더링
+        return "home";
     }
-
 
 }

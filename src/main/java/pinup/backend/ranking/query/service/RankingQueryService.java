@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.ranking.query.dto.MyRankResponse;
 import pinup.backend.ranking.query.dto.TopRankResponse;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -23,23 +27,51 @@ public class RankingQueryService {
 
     private final NamedParameterJdbcTemplate jdbc;
 
-    /**
-     * ✅ 상위 100위 캐시 조회 (없으면 DB에서 조회 후 캐시 저장)
-     * 캐시 유효시간: CacheConfig.java 에서 설정 (기본 1분)
-     */
+    /** 상위 100위: 랭킹은 ranking 테이블, 완료 개수는 조회 시 계산 */
     @Cacheable(cacheNames = "rankingTop100", key = "#ym")
     public List<TopRankResponse> getTop100(String ym) {
+        YearMonth y = YearMonth.parse(ym);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        LocalDateTime start = y.atDay(1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime end = y.plusMonths(1).atDay(1).atStartOfDay(zone).toLocalDateTime();
+
         String sql = """
-            SELECT r.rank_int AS rank, r.user_id, u.user_name, r.completed_count
-            FROM user_monthly_territory_rank r
-            JOIN users u ON u.user_id = r.user_id
-            WHERE r.year_month = :ym
-              AND u.status = 'ACTIVE'
-              AND r.rank_int <= 100
-            ORDER BY r.rank_int, r.user_id
+            WITH counts AS (
+                SELECT
+                  t.user_id,
+                  COUNT(DISTINCT t.region_code) AS completed_count
+                FROM territory t
+                JOIN users u ON u.user_id = t.user_id AND u.status = 'ACTIVE'
+                WHERE t.capture_end_at >= :start
+                  AND t.capture_end_at  < :end
+                  AND EXISTS (
+                    SELECT 1 FROM territory_visit_log v
+                    WHERE v.territory_id = t.territory_id
+                      AND v.is_valid = TRUE
+                  )
+                GROUP BY t.user_id
+            )
+            SELECT
+              r.rank         AS rank,
+              r.user_id      AS user_id,
+              u.user_name    AS user_name,
+              COALESCE(c.completed_count, 0) AS completed_count
+            FROM ranking r
+            JOIN users u   ON u.user_id = r.user_id AND u.status = 'ACTIVE'
+            LEFT JOIN counts c ON c.user_id = r.user_id
+            WHERE r.year = :year AND r.month = :month
+            ORDER BY r.rank ASC, r.user_id ASC
+            LIMIT 100
             """;
 
-        return jdbc.query(sql, Map.of("ym", ym), (rs, rn) -> TopRankResponse.builder()
+        Map<String, Object> params = Map.of(
+                "start", Timestamp.valueOf(start),
+                "end",   Timestamp.valueOf(end),
+                "year",  y.getYear(),
+                "month", y.getMonthValue()
+        );
+
+        return jdbc.query(sql, params, (rs, rn) -> TopRankResponse.builder()
                 .rank(rs.getInt("rank"))
                 .userId(rs.getLong("user_id"))
                 .userName(rs.getString("user_name"))
@@ -47,52 +79,80 @@ public class RankingQueryService {
                 .build());
     }
 
-    /**
-     * ✅ 특정 연월 캐시 무효화 (Command 서비스에서 집계 완료 후 호출)
-     */
+    /** 캐시 무효화 (Command 완료 후 호출) */
     @CacheEvict(cacheNames = "rankingTop100", key = "#ym")
     public void evictTop100Cache(String ym) {
-        // 내용 없음 — 애노테이션이 캐시 삭제를 자동 처리
+        // 애노테이션이 처리
     }
 
-    /**
-     * ✅ 내 순위 조회 (캐시 사용 X)
-     */
+    /** 내 순위: ranking에서 랭크 읽고, 완료 개수는 해당 월 계산 */
     public MyRankResponse getMyRank(String ym, long userId) {
-        String sql = """
-            SELECT rank_int AS rank, completed_count
-            FROM user_monthly_territory_rank
-            WHERE year_month = :ym
-              AND user_id    = :userId
-            """;
+        YearMonth y = YearMonth.parse(ym);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        LocalDateTime start = y.atDay(1).atStartOfDay(zone).toLocalDateTime();
+        LocalDateTime end = y.plusMonths(1).atDay(1).atStartOfDay(zone).toLocalDateTime();
 
-        List<MyRankResponse> list = jdbc.query(
-                sql,
-                Map.of("ym", ym, "userId", userId),
-                (rs, rowNum) -> MyRankResponse.builder()
-                        .rank(rs.getObject("rank", Integer.class))
-                        .completedCount(rs.getObject("completed_count", Integer.class))
-                        .message(null)
-                        .build()
-        );
+        // rank 읽기
+        Integer rank = jdbc.query(
+                "SELECT r.rank FROM ranking r WHERE r.year=:year AND r.month=:month AND r.user_id=:uid",
+                Map.of("year", y.getYear(), "month", y.getMonthValue(), "uid", userId),
+                (rs, rn) -> rs.getInt("rank")
+        ).stream().findFirst().orElse(null);
 
-        // 데이터 없을 경우
-        if (list.isEmpty()) {
-            return MyRankResponse.builder()
-                    .rank(null)
-                    .completedCount(0)
-                    .message("해당 월 점령 완료 기록이 없습니다.")
-                    .build();
+        // completed_count 계산
+        Integer completed = jdbc.query(
+                """
+                SELECT COUNT(DISTINCT t.region_code) AS cnt
+                FROM territory t
+                JOIN users u ON u.user_id = t.user_id AND u.status = 'ACTIVE'
+                WHERE t.user_id = :uid
+                  AND t.capture_end_at >= :start
+                  AND t.capture_end_at  < :end
+                  AND EXISTS (
+                    SELECT 1 FROM territory_visit_log v
+                    WHERE v.territory_id = t.territory_id
+                      AND v.is_valid = TRUE
+                  )
+                """,
+                Map.of("uid", userId,
+                        "start", Timestamp.valueOf(start),
+                        "end", Timestamp.valueOf(end)),
+                (rs, rn) -> rs.getInt("cnt")
+        ).stream().findFirst().orElse(0);
+
+        // RankingQueryService.getMyRank(...)
+        if (rank == null) {
+            if (completed == 0) {
+                return MyRankResponse.builder()
+                        .rank(null)
+                        .completedCount(0)
+                        .message("해당 월 점령 완료 기록이 없습니다.")
+                        .build();
+            } else {
+                return MyRankResponse.builder()
+                        .rank(null)
+                        .completedCount(completed)
+                        .message("순위권 밖에 있습니다.")
+                        .build();
+            }
         }
 
-        MyRankResponse r = list.get(0);
-        if (r.getRank() != null && r.getRank() > 100) {
-            return MyRankResponse.builder()
-                    .rank(r.getRank())
-                    .completedCount(r.getCompletedCount())
-                    .message("순위권 밖에 있습니다.")
-                    .build();
-        }
-        return r;
+// (rank != null) 케이스
+        return MyRankResponse.builder()
+                .rank(rank)
+                .completedCount(completed)
+                .message(null)    // TOP100 안이므로 메시지 없음
+                .build();
+
     }
 }
+
+/*
+목적: “월간 랭킹 데이터를 캐싱하며 빠르게 조회”하는 역할을 하고,
+“내 순위 조회는 항상 최신값을 DB에서 가져오는 구조”
+
+JSON 응답 예시
+{ "rank": 12, "completedCount": 35 }
+{ "rank": 150, "completedCount": 20, "message": "순위권 밖에 있습니다." }
+{ "completedCount": 0, "message": "해당 월 점령 완료 기록이 없습니다." }
+ */

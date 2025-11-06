@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,7 +16,7 @@ import pinup.backend.member.command.repository.AdminRepository;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig{
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAdminDetailsService customAdminDetailsService;
@@ -25,7 +26,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // 개발 중이라면 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 // 사용자: OAuth2 로그인
@@ -70,6 +72,15 @@ public class SecurityConfig {
                         .build());
             }
         };
+    }
+
+    /*
+    * sse 연결 수립 테스트를 위해 임시로 /sse/** 경로는 filterchain을 우회하도록 설정함
+    * 추후 삭제 예정
+    */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/sse/**");
     }
 
 }

@@ -10,8 +10,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class NotificationRequest {
-    private Integer senderId;
-    private Integer receiverId;
-    private String notificationType;
+    private Long senderId;
+    private Long receiverId;
+    private NotificationType notificationType;
     private String notificationMessage;
+
+    public enum NotificationType {
+        FEED_LIKE, BONUS_POINT, SUSPEND, REPORT_HANDLED
+    }
 }
