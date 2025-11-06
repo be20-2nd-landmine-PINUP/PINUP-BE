@@ -42,7 +42,7 @@ class PointCommandControllerTest {
         commandService = mock(PointCommandService.class);
         var controller = new PointCommandController(commandService);
 
-        // 4) IllegalArgumentException → 400으로 매핑하는 테스트용 Advice
+        // 4) IllegalArgumentException → 400으로 매핑하는 테스트용 Advice (옵션)
         var advice = new TestAdvice();
 
         // 5) MockMvc 빌드
@@ -53,18 +53,16 @@ class PointCommandControllerTest {
                 .build();
     }
 
-    /* ============ /api/points/grant ============ */
+    /* ============ /api/points/grant/like ============ */
 
     @Test
     void grant_like_ok() throws Exception {
         var payload = Map.of(
                 "userId", 1L,
-                "pointValue", 5,             // GrantPointRequest에 필수
-                "sourceId", 101L,
-                "sourceType", "LIKE"
+                "sourceId", 101L
         );
 
-        MvcResult res = mvc.perform(post("/api/points/grant")
+        MvcResult res = mvc.perform(post("/api/points/grant/like")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(payload)))
                 .andDo(print())
@@ -77,24 +75,20 @@ class PointCommandControllerTest {
         System.out.println("   ├─ sourceId : " + payload.get("sourceId"));
         System.out.println("   └─ status   : " + response.getStatus());
 
-        /*mvc.perform(post("/api/points/grant")                     // ✅ content는 post(...) 체인 안에서
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(payload)))
-                .andExpect(status().isNoContent());
-*/
         verify(commandService).grantLike(1L, 101L);
         verifyNoMoreInteractions(commandService);
     }
+
+    /* ============ /api/points/grant/capture ============ */
 
     @Test
     void grant_capture_ok() throws Exception {
         var payload = Map.of(
                 "userId", 2L,
-                "pointValue", 10,
-                "sourceId", 999L,
-                "sourceType", "CAPTURE"
+                "sourceId", 999L  // territoryId
         );
-        MvcResult res = mvc.perform(post("/api/points/grant")
+
+        MvcResult res = mvc.perform(post("/api/points/grant/capture")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(payload)))
                 .andDo(print())
@@ -107,39 +101,8 @@ class PointCommandControllerTest {
         System.out.println("   ├─ territoryId : " + payload.get("sourceId"));
         System.out.println("   └─ status      : " + response.getStatus());
 
-        /*mvc.perform(post("/api/points/grant")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(payload)))
-                .andExpect(status().isNoContent());*/
-
         verify(commandService).grantCapture(2L, 999L);
         verifyNoMoreInteractions(commandService);
-    }
-
-    @Test
-    void grant_invalid_sourceType_400() throws Exception {
-        var payload = Map.of(
-                "userId", 3L,
-                "pointValue", 5,
-                "sourceId", 1L,
-                "sourceType", "XXX"          // 컨트롤러에서 IllegalArgumentException 발생
-        );
-        MvcResult res = mvc.perform(post("/api/points/grant")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(payload)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        MockHttpServletResponse response = res.getResponse();
-        System.out.println("⚠️ 잘못된 요청 (400)");
-        System.out.println("   └─ message : " + response.getContentAsString());
-
-       /* mvc.perform(post("/api/points/grant")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(payload)))
-                .andExpect(status().isBadRequest());              // TestAdvice가 400으로 매핑
-*/
     }
 
     /* ============ /api/points/use ============ */
@@ -148,12 +111,11 @@ class PointCommandControllerTest {
     void use_ok() throws Exception {
         var payload = Map.of(
                 "userId", 1L,
-                "pointValue", 1500,          // UsePointRequest에 필수
+                "pointValue", 1500,
                 "sourceId", 20231101L
         );
 
-
-        var result = mvc.perform(post("/api/points/use")
+        MvcResult result = mvc.perform(post("/api/points/use")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(payload)))
                 .andDo(print())
@@ -164,6 +126,9 @@ class PointCommandControllerTest {
                 result.getResponse().getStatus(),
                 payload.get("userId"),
                 payload.get("pointValue"));
+
+        verify(commandService).use(1L, 1500, 20231101L);
+        verifyNoMoreInteractions(commandService);
     }
 
     // ===== 테스트 전용 예외 매핑 (IllegalArgumentException -> 400) =====
