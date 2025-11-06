@@ -1,5 +1,5 @@
-[README.md](https://github.com/user-attachments/files/23380993/README.md)
-<img width="1000" height="400" alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
+[README.md](https://github.com/user-attachments/files/23381164/README.md)
+<img width="800"  alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
 
 ### 🧭 프로젝트 개요 (Overview)
 - 프로젝트명: 핀-업 (Pin-Up)
@@ -12,7 +12,7 @@
 
 <br>
 
-### 👥 팀 구성 (Contributors)
+## 👥 팀 구성 (Contributors)
 
 <table style="width: 100%; text-align: center;">
 <tr>
@@ -45,18 +45,76 @@
 </tr>
 </table>
 
-### ✨ 주요 기능 (Features)
+## ✨ 주요 기능 (Features)
+###  Auth (인증)
+- JWT 기반 로그인 및 회원 인증  
+- Access / Refresh Token 발급 및 검증  
+- 회원가입, 로그인, 로그아웃, 토큰 재발급 기능  
 
-### 🏗️ 프로젝트 아키텍처 (Architecture)
+###  Config (환경설정)
+- 전역 설정 및 공통 예외 처리  
+- CORS, Security, Swagger 등 설정 관리  
 
-### 🧩 ERD 및 주요 도메인 (Domain & ERD)
+###  Conquer (영토 점령)
+- 위치 기반으로 여행한 지역을 점령 등록  
+- 지도 좌표와 연동된 점령 데이터 저장  
+- 지역별 점령 이력 및 시각화 기능  
 
-### 🔗 API 구조 (API Overview)
+###  Feed (피드)
+- 유저별 여행 기록 피드 생성  
+- 게시글 작성 / 수정 / 삭제  
+- 좋아요, 댓글 등 소셜 상호작용 기능  
 
-### 📁 폴더 구조 (Directory Structure)
+###  Home (홈)
+- 서비스 메인 화면 구성  
+- 요약 통계, 최근 점령 지역, 공지 요약 표시  
 
-### 🚀 실행 및 테스트 방법 (Run & Test)
+###  Member (회원)
+- 회원 프로필, 닉네임, 포인트 관리  
+- 활동 통계 및 등급 표시  
+- 내 점령 지역 및 구매 아이템 조회  
 
-### 🧪 Postman / Swagger
+###  Notice (공지)
+- 공지사항 등록 / 수정 / 조회  
+- 이벤트 및 업데이트 안내  
 
-### 🤝 기여 가이드 (Contribution Guide)
+###  Notification (알림)
+- 점령/댓글/좋아요 등 실시간 알림 전송  
+- 읽음/미확인 상태 관리  
+
+###  Ranking (랭킹)
+- 점령 지역 수 및 활동 점수 기반 순위 집계  
+- 지역별 / 전국 랭킹 제공  
+
+###  Report (리포트)
+- 여행 통계 리포트 자동 생성  
+- 방문 횟수, 점령 비율, 지도 시각화  
+
+###  Store (상점)
+- 아이템 목록 및 카테고리별 조회  
+- 아이템 구매 / 장착 / 해제 기능  
+- 한정판, 이벤트 아이템 관리
+
+## 🏗️ 프로젝트 아키텍처 (Architecture)
+
+
+| 구분 | 사용 기술 |
+| --- | --- |
+| **Backend** | Spring Boot, Spring Security, JPA (Hibernate) |
+| **Database** | MariaDB |
+| **Frontend** | Vue.js |
+| **Map / Location** | Kakao Map API, Google Maps, GeoJSON |
+| **Auth** | JWT, OAuth2 (Kakao / Google) |
+<br>
+
+## 🧩 ERD 및 주요 도메인 (Domain & ERD)
+
+## 🔗 API 구조 (API Overview)
+
+## 📁 폴더 구조 (Directory Structure)
+
+## 🚀 실행 및 테스트 방법 (Run & Test)
+
+## 🧪 Postman / Swagger
+
+## 🤝 기여 가이드 (Contribution Guide)
