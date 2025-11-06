@@ -29,17 +29,7 @@ public class SecurityConfig{
         http
                 .csrf(csrf -> csrf.disable()) // 개발 중이라면 비활성화
                 .authorizeHttpRequests(auth -> auth
-                            // ===== API 권한  =====
-                        // /api/points/grant/like → 피드 역할(FEED)만 접근 가능
-                        .requestMatchers(HttpMethod.POST, "/api/points/grant/like").hasRole("FEED")
-                        // /api/points/grant/capture → 점령 역할(CAPTURE)만 접근 가능
-                        .requestMatchers(HttpMethod.POST, "/api/points/grant/capture").hasRole("CAPTURE")
-                        // /api/points/use → 매장(STORE) 역할만 접근 가능
-                        .requestMatchers(HttpMethod.POST, "/api/points/use").hasRole("STORE")
-                        // 포인트 조회(/api/points/**)는 로그인 사용자면 모두 가능
-                        .requestMatchers(HttpMethod.GET,  "/api/points/**").authenticated()
-
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream")
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/notifications/stream", "/admin/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

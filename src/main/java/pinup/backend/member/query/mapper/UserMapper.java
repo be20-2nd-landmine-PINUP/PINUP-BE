@@ -9,27 +9,7 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
-    @Select("""
-        SELECT
-            user_id AS userId,
-            user_name AS name,
-            nickname,
-            email,
-            status
-        FROM users
-        ORDER BY user_id DESC
-    """)
     List<UserDto> findAllUsers();
 
-    @Select("""
-        SELECT
-            user_id AS userId,
-            user_name AS name,
-            nickname,
-            email,
-            status
-        FROM users
-        WHERE user_id = #{id}
-    """)
     UserDto findUserById(int id);
 }
