@@ -15,6 +15,7 @@ import pinup.backend.conquer.command.domain.repository.TerritoryRepository;
 import pinup.backend.conquer.query.mapper.RegionMapper;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
+import pinup.backend.point.command.service.PointService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,6 +30,7 @@ public class ConquerSessionService {
     private final ConquerSessionRepository conquerSessionRepository;
     private final TerritoryRepository territoryRepository;
     private final UserRepository userRepository;
+    private final PointService pointService;
 
     private static final Duration CONQUER_DURATION = Duration.ofHours(2);
 
@@ -90,6 +92,7 @@ public class ConquerSessionService {
                 null // photoUrl, not set for now
         );
         territoryRepository.save(territory);
+        pointService.grantCapturePoint(userId, currentRegion.getRegionId());
 
         String message = String.format("Successfully conquered %s!", currentRegion.getRegionName());
         return ConquerEndResponse.of("SUCCESS", message, currentRegion);

@@ -1,6 +1,5 @@
 package pinup.backend.point.command.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +17,43 @@ public class PointService {
 
     private final PointLogRepository pointLogRepository;
     private final TotalPointRepository totalPointRepository;
+
+    /**
+     * ✅ 정복(CAPTURE) 완료 시 5점 지급
+     */
+    @Transactional
+    public void grantCapturePoint(Long userId, Long regionId) {
+        String eventKey = "CAPTURE_" + userId + "_" + regionId; // 중복 지급 방지용 키
+
+        /*if (pointLogRepository.existsByEventKey(eventKey)) {
+            // 이미 포인트 지급된 지역이면 중복 방지
+            throw new IllegalStateException("이미 해당 지역의 정복 포인트가 지급되었습니다: " + eventKey);
+        } */
+
+        Users user = Users.builder().userId(userId).build();
+        int pointValue = 5;
+
+        // 1️⃣ 포인트 로그 저장
+        PointLog log = PointLog.builder()
+                .user(user)
+                .pointSourceId(regionId.intValue())  // 지역 ID 저장
+                .sourceType(PointSourceType.CAPTURE) // ✅ 정복 이벤트 타입
+                .eventKey(eventKey)
+                .pointValue(pointValue)
+                .build();
+        pointLogRepository.save(log);
+
+        // 2️⃣ 누적 포인트 조회 또는 새로 생성
+        TotalPoint total = totalPointRepository.findByUserId(userId)
+                .orElseGet(() -> TotalPoint.builder()
+                        .user(user)
+                        .totalPoint(0)
+                        .build());
+
+        // 3️⃣ 포인트 증가 후 저장
+        total.addPoints(pointValue);
+        totalPointRepository.save(total);
+    }
 
     /**
      * ✅ 외부 서비스로부터 거래기록을 전달받아 로그 저장만 수행
