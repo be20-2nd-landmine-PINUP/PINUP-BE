@@ -14,7 +14,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RankingService {
+public class RankingQueryService {
 
     private final TerritoryRepository territoryRepository;
     private final UserRepository userRepository; // 닉네임/프로필 조회용
@@ -81,5 +81,34 @@ public class RankingService {
                         u -> java.util.Optional.ofNullable(u.getNickname()).orElse("User" + u.getUserId())
                 ));
     }
+
+
+    @Transactional(readOnly = true)
+    public MyRankDto getMyMonthlyRank(Long userId, YearMonth ym) {
+        // 1) 전체 랭킹 조회 (Top100 + 동점 포함)
+        List<MonthlyRankDto> ranks = getMonthlyTop100WithTies(ym);
+
+        // 2) 내 순위 찾기 (NPE 방지 equals)
+        return ranks.stream()
+                .filter(r -> java.util.Objects.equals(r.getUserId(), userId))
+                .findFirst()
+                .map(r -> new MyRankDto(
+                        r.getUserId(),
+                        r.getNickname(),
+                        r.getCaptureCount(),
+                        r.getRank(),
+                        "현재 " + r.getRank() + "위입니다."
+                ))
+                .orElseGet(() -> new MyRankDto(
+                        userId,
+                        userRepository.findById(userId)
+                                .map(Users::getNickname)
+                                .orElse("Unknown"),
+                        null,       // 순위권 밖이면 점령 수 비노출 정책
+                        null,       // 순위 없음
+                        "순위권 밖입니다."
+                ));
+    }
+
 
 }
