@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RankingController {
 
-    private final RankingService rankingService;
+    private final RankingQueryService rankingQueryService;
 
     /**
      * 예:
@@ -31,7 +31,7 @@ public class RankingController {
     ) {
         YearMonth ym = YearMonth.of(year, month);
 
-        return rankingService.getMonthlyTop100WithTies(ym);
+        return rankingQueryService.getMonthlyTop100WithTies(ym);
     }
 
 }
