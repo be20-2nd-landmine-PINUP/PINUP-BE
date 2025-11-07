@@ -1,17 +1,15 @@
 package pinup.backend.ranking;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
 
-// API 응답 DTO
 @Getter
-@Builder
+@AllArgsConstructor
 public class MonthlyRankDto {
-    private int rank;
-    private Long userId;
-    private String nickname;
-    private long captureCount;
-    private Instant lastCaptureAt;
+    private final Integer rank;
+    private final Long userId;
+    private final String nickname;
+    private final Long captureCount;
+    private final java.time.Instant lastCaptureAt;
 }

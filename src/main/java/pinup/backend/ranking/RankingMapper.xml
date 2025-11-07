@@ -1,0 +1,42 @@
+<!-- src/main/resources/mappers/RankingMapper.xml -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="...ranking.mapper.RankingMapper">
+
+    <!-- 필요시 camelCase 매핑 설정: mybatis.configuration.map-underscore-to-camel-case=true -->
+
+    <select id="selectMonthlyTop100WithTies" resultType="...ranking.dto.MonthlyRankDto">
+        WITH user_month AS (
+        SELECT
+        t.user_id                    AS userId,
+        COUNT(DISTINCT t.region_id)  AS captureCount,
+        MAX(t.capture_end_at)        AS lastCaptureAt
+        FROM territory t
+        WHERE t.capture_end_at IS NOT NULL
+        AND t.capture_end_at >= #{start}
+        AND t.capture_end_at <  #{end}
+        GROUP BY t.user_id
+        ),
+        ranked AS (
+        SELECT
+        um.userId,
+        um.captureCount,
+        um.lastCaptureAt,
+        RANK() OVER (ORDER BY um.captureCount DESC, um.lastCaptureAt ASC, um.userId ASC) AS rnk
+        FROM user_month um
+        )
+        SELECT
+        r.rnk                              AS rank,
+        r.userId                           AS userId,
+        u.nickname                         AS nickname,
+        r.captureCount                     AS captureCount,
+        r.lastCaptureAt                    AS lastCaptureAt
+        FROM ranked r
+        JOIN users u ON u.user_id = r.userId
+        -- 필요 시 상태 필터: AND u.status = 'ACTIVE'
+        WHERE r.rnk <= 100
+        ORDER BY r.captureCount DESC, r.lastCaptureAt ASC, r.userId ASC
+    </select>
+
+</mapper>
