@@ -7,11 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.conquer.command.domain.repository.TerritoryRepository;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
-
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class RankingService {
         if (kth.isEmpty()) {
             return List.of();
         }
-        long minCount = kth.get(0).getCaptureCount();
+        long minCount = kth.getFirst().getCaptureCount();
 
         // 2) 컷오프 이상(동점 포함) 전부 조회
         List<MonthlyCaptureRankView> rows =
