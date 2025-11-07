@@ -167,4 +167,7 @@
 
 ## 🧪 Postman / Swagger
 
+![test](https://github.com/user-attachments/assets/8829c3fb-7844-45aa-b65e-a66becb3cdbb)
+
+
 ## 🤝 기여 가이드 (Contribution Guide)
