@@ -41,7 +41,7 @@ public class StoreServiceIntegrationTest {
 
     @Test
     @DisplayName("✅ 실제 DB에 포인트 차감 및 로그가 반영되는지 검증")
-    void purchaseItem_db반영검증() {
+    void purchaseItem_db() {
         // given
         Users user = userRepository.save(
                 Users.builder()
