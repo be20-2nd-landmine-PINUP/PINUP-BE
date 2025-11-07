@@ -33,7 +33,7 @@ public class PointQueryService {
      * - 최신순으로 반환
      */
     public List<PointLog> getUserPointLogs(Long userId) {
-        return pointLogRepository.UserPointLog(userId);
+        return pointLogRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
     }
 
 }

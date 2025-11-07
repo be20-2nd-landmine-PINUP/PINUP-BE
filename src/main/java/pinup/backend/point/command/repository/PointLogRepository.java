@@ -8,5 +8,5 @@ import java.util.List;
 public interface PointLogRepository extends JpaRepository<PointLog, Integer> {
     boolean existsByEventKey(String eventKey);
 
-    List<PointLog> UserPointLog(Long userId);
+    List<PointLog> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
 }
