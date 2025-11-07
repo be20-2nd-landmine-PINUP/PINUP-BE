@@ -1,33 +1,47 @@
 package pinup.backend.point.command.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
+import pinup.backend.member.command.domain.Users;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "total_point")
 public class TotalPoint {
+
+    /**
+     * ✅ user_id : Users 엔티티의 PK를 그대로 사용 (1:1 매핑)
+     */
     @Id
     @Column(name = "user_id")
     private Long userId;
 
+    /**
+     * ✅ 누적 포인트 (기본값 0)
+     */
     @Column(name = "total_point", nullable = false)
-    private Integer totalPoint = 0;
+    private int totalPoint;
 
-    protected TotalPoint() {} // JPA에서 호출되는 기본 생성자
-    public TotalPoint(Long userId, Integer totalPoint) {
-        this.userId = userId;
-        this.totalPoint = totalPoint;
-    } //비즈니스 로직에서 새 객체를 만들 떄 사용 (서비스, 리포지토리)
+    /**
+     * ✅ Users 엔티티와 1:1 관계 (읽기 전용, 외래키 연결)
+     * mappedBy 없이 JoinColumn으로 직접 지정
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private Users user;
 
-    public Long getUserId() { return userId; } // 조회용. 외부에서 읽기만 가능함
-    //현재 총 포인트 조회 (읽기 전용)
-    public Integer getTotalPoint() { return totalPoint; } // 포인트 잔액 보여주기 위한 조회용 GETTER
-    // 포인트를 변경(증가/감소)하는 메서드.
-    public void add(int v) { this.totalPoint += v; } // 포인트 변경; 내부 규칙에 따라서만 가능하게
+    // 💡 누적 포인트 증가/차감 로직
+    public void addPoints(int value) {
+        this.totalPoint += value;
+    }
+
+    public void subtractPoints(int value) {
+        this.totalPoint -= value;
+        if (this.totalPoint < 0) this.totalPoint = 0;
+    }
 }
-/**
- * 사용자별 총 포인트를 관리하는 엔티티 클래스.
- *
- * - 각 사용자는 1개의 TotalPoint 레코드를 가짐.
- * - 누적 포인트(total_point)는 좋아요, 점령, 사용 등의 이벤트에 따라 변경됨.
- * - 단순 합계만 저장하며, 개별 거래 내역은 별도의 로그 테이블에서 관리하는 것이 일반적.
- */

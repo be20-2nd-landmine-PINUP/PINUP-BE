@@ -13,8 +13,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.util.ReflectionTestUtils;
-import pinup.backend.point.command.service.MonthlyBonusScheduler;
-import pinup.backend.point.command.service.PointCommandService;
 
 import java.sql.Timestamp;
 import java.time.Clock;

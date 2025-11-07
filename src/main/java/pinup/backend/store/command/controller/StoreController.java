@@ -8,8 +8,6 @@ import pinup.backend.store.command.domain.Inventory;
 import pinup.backend.store.command.dto.InventoryResponseDto;
 import pinup.backend.store.command.service.StoreService;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/store/command")

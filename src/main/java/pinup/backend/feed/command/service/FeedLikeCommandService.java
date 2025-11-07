@@ -13,7 +13,7 @@ import pinup.backend.feed.common.exception.DuplicateLikeException;
 import pinup.backend.feed.common.exception.FeedNotFoundException;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
-import pinup.backend.point.command.service.PointCommandService;
+import pinup.backend.point.command.service.PointService;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class FeedLikeCommandService {
     private final FeedRepository feedRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final UserRepository userRepository;
-    private final PointCommandService pointCommandService; // 우선은 서비스 직접 등록
+    private final PointService pointService; // 우선은 서비스 직접 등록
 
     public record LikeResult(boolean liked, long likeCount) {}
 
@@ -55,7 +55,7 @@ public class FeedLikeCommandService {
 
             // 좋아요 포인트 지급
             Long authorId = feed.getUserId().getUserId();
-            pointCommandService.grantLike(authorId, feedId);
+            pointService.grantLike(authorId, feedId);
 
         } catch (DataIntegrityViolationException e) {
             // 중복 insert 발생은 중복 좋아요로 간주
