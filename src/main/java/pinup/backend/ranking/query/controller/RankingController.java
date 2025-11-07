@@ -1,10 +1,13 @@
-package pinup.backend.ranking;
+package pinup.backend.ranking.query.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pinup.backend.ranking.query.service.RankingQueryService;
+import pinup.backend.ranking.query.dto.MonthlyRankDto;
+import pinup.backend.ranking.query.dto.MyRankDto;
 
 import java.time.YearMonth;
 import java.util.List;

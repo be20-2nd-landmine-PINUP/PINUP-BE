@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pinup.backend.ranking.query.mapper.RankingMapper">
+    <select id="selectMonthlyTop100WithTies" resultType="pinup.backend.ranking.query.dto.MonthlyRankDto">
+        <!-- 유저별 월간 점령 집계 -->
+        WITH user_month AS (
+        SELECT
+        t.user_id                   AS userId,
+        COUNT(DISTINCT t.region_id) AS captureCount,
+        MAX(t.capture_end_at)       AS lastCaptureAt
+        FROM territory t
+        WHERE t.capture_end_at IS NOT NULL
+        AND t.capture_end_at >= #{start}
+        AND t.capture_end_at &lt; #{endDate}
+        GROUP BY t.user_id
+        ),
+        <!--윈도우 함수로 순위 계산 (동점 허용) -->
+        ranked AS (
+        SELECT
+        um.userId,
+        um.captureCount,
+        um.lastCaptureAt,
+        RANK() OVER (ORDER BY um.captureCount DESC, um.lastCaptureAt ASC, um.userId ASC) AS rnk
+        FROM user_month um
+        )
+        <!-- TOP 100위 랭킹 결과 반환 -->
+        SELECT
+        r.rnk          AS rank,
+        r.userId       AS userId,
+        u.nickname     AS nickname,
+        r.captureCount AS captureCount,
+        r.lastCaptureAt AS lastCaptureAt
+        FROM ranked r
+        JOIN users u ON u.user_id = r.userId
+        WHERE r.rnk &lt;= 100
+        ORDER BY r.captureCount DESC, r.lastCaptureAt ASC, r.userId ASC
+    </select>
+</mapper>
