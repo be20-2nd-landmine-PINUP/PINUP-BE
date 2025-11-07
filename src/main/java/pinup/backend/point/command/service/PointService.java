@@ -28,10 +28,7 @@ public class PointService {
     public void grantCapturePoint(Long userId, Long regionId) {
         String eventKey = "CAPTURE_" + userId + "_" + regionId; // 중복 지급 방지용 키
 
-        /*if (pointLogRepository.existsByEventKey(eventKey)) {
-            // 이미 포인트 지급된 지역이면 중복 방지
-            throw new IllegalStateException("이미 해당 지역의 정복 포인트가 지급되었습니다: " + eventKey);
-        } */
+        if (pointLogRepository.existsByEventKey(eventKey)) return; // 둘 다 동일 정책
 
         Users user = Users.builder().userId(userId).build();
         int pointValue = 5;
