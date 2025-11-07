@@ -10,6 +10,9 @@ import pinup.backend.point.command.domain.TotalPoint;
 import pinup.backend.point.command.repository.PointLogRepository;
 import pinup.backend.point.command.repository.TotalPointRepository;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -52,6 +55,35 @@ public class PointService {
 
         // 3️⃣ 포인트 증가 후 저장
         total.addPoints(pointValue);
+        totalPointRepository.save(total);
+    }
+
+    /** 월간 100명 이하 지역 방문 보너스 +10점 (yyyyMM 단위로 idempotent) */
+    @Transactional
+    public void grantCaptureMonthlyBonus(Long userId, Long regionId, YearMonth yearMonth) {
+        String ym = yearMonth.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        String eventKey = "CAPTURE_BONUS_" + ym + "_" + userId + "_" + regionId;
+
+        if (pointLogRepository.existsByEventKey(eventKey)) {
+            // 이미 지급된 보너스면 무시(중복 방지)
+            return;
+        }
+
+        Users user = Users.builder().userId(userId).build();
+        int bonus = 10;
+
+        PointLog log = PointLog.builder()
+                .user(user)
+                .pointSourceId(regionId.intValue())
+                .sourceType(PointSourceType.MONTHLY_BONUS) // 보너스는 MONTHLY_BONUS타입으로 기록
+                .eventKey(eventKey)
+                .pointValue(bonus)
+                .build();
+        pointLogRepository.save(log);
+
+        TotalPoint total = totalPointRepository.findByUserId(userId)
+                .orElseGet(() -> TotalPoint.builder().user(user).totalPoint(0).build());
+        total.addPoints(bonus);
         totalPointRepository.save(total);
     }
 

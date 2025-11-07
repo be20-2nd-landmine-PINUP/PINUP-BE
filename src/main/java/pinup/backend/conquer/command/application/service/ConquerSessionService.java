@@ -1,6 +1,7 @@
 package pinup.backend.conquer.command.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pinup.backend.conquer.command.application.dto.ConquerEndRequest;
@@ -10,8 +11,10 @@ import pinup.backend.conquer.command.application.dto.ConquerStartResponse;
 import pinup.backend.conquer.command.domain.entity.ConquerSession;
 import pinup.backend.conquer.command.domain.entity.Region;
 import pinup.backend.conquer.command.domain.entity.Territory;
+import pinup.backend.conquer.command.domain.entity.TerritoryVisitLog;
 import pinup.backend.conquer.command.domain.repository.ConquerSessionRepository;
 import pinup.backend.conquer.command.domain.repository.TerritoryRepository;
+import pinup.backend.conquer.command.domain.repository.TerritoryVisitLogRepository;
 import pinup.backend.conquer.query.mapper.RegionMapper;
 import pinup.backend.member.command.domain.Users;
 import pinup.backend.member.command.repository.UserRepository;
@@ -19,6 +22,8 @@ import pinup.backend.point.command.service.PointService;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -29,6 +34,7 @@ public class ConquerSessionService {
     private final RegionMapper regionMapper;
     private final ConquerSessionRepository conquerSessionRepository;
     private final TerritoryRepository territoryRepository;
+    private final TerritoryVisitLogRepository territoryVisitLogRepository;
     private final UserRepository userRepository;
     private final PointService pointService;
 
@@ -92,7 +98,39 @@ public class ConquerSessionService {
                 null // photoUrl, not set for now
         );
         territoryRepository.save(territory);
+        // ✅ 방문 로그 저장
+        TerritoryVisitLog visitLog = new TerritoryVisitLog(
+                0L,
+                territory,
+                (int) elapsed.toMinutes(), // 임시 duration
+                true,                       // 유효 방문
+                Date.from(now)              // 방문 시각
+        );
+
+        territoryVisitLogRepository.save(visitLog);
+
+        //기본 5점 부여
         pointService.grantCapturePoint(userId, currentRegion.getRegionId());
+
+        // ✅ 월간 방문자 수 집계 후 100명 이하이면 보너스 +10
+        YearMonth ym = YearMonth.from(
+                Instant.ofEpochMilli(visitLog.getVisitedAt().getTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+        );
+        Date monthStart = Date.from(ym.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date monthEnd = Date.from(ym.atEndOfMonth().atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+
+        long monthlyVisitors = territoryVisitLogRepository
+                .countDistinctVisitors(
+                        currentRegion.getRegionId(),
+                        monthStart,
+                        monthEnd
+                );
+
+        if (monthlyVisitors <= 100) {
+            pointService.grantCaptureMonthlyBonus(userId, currentRegion.getRegionId(), ym);
+        }
 
         String message = String.format("Successfully conquered %s!", currentRegion.getRegionName());
         return ConquerEndResponse.of("SUCCESS", message, currentRegion);
