@@ -12,10 +12,9 @@ import static org.mockito.Mockito.verify;
 import org.mockito.Mock;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import pinup.backend.store.command.controller.StoreController;
-import pinup.backend.store.command.domain.*;
 import pinup.backend.store.command.dto.StoreDetailResponseDto;
 import pinup.backend.store.command.dto.StoreSummaryResponseDto;
+import pinup.backend.store.query.controller.StoreQueryController;
 import pinup.backend.store.query.service.StoreQueryService;
 import java.util.List;
 import static org.mockito.Mockito.*;
@@ -24,10 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @ExtendWith(MockitoExtension.class)
-class StoreControllerTest {
+class StoreQueryControllerTest {
 
     @Mock private StoreQueryService storeQueryService;
-    @InjectMocks private StoreController storeController;
+    @InjectMocks private StoreQueryController storeQueryController;
     private MockMvc mockMvc;
 
     private StoreSummaryResponseDto summaryDto;
@@ -36,7 +35,7 @@ class StoreControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(storeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(storeQueryController).build();
 
         summaryDto = StoreSummaryResponseDto.builder()
                 .itemId(1)

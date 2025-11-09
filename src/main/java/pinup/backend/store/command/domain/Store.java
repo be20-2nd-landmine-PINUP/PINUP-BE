@@ -61,8 +61,8 @@ public class Store {
     private boolean isActive = true;
 
     // 아이템 정보 수정 메서드
-    public void update(StoreRequestDto dto) {
-        this.region = dto.getRegion();
+    public void update(StoreRequestDto dto, Region region) {
+        this.region = region;
         this.name = dto.getName();
         this.description = dto.getDescription();
         this.price = dto.getPrice();
