@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/23443326/README.md)
+[README.md](https://github.com/user-attachments/files/23443549/README.md)
 <img width="800"  alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
 
 ### 🧭 프로젝트 개요 (Overview)
@@ -174,13 +174,77 @@ https://www.erdcloud.com/d/2rXFd73ekcpsxZJa9
 
 ## 🚀 실행 및 테스트 방법 (Run & Test)
 
+<details>
+<summary>🧩 1️⃣ 환경 요구사항 (Requirements)</summary>
 
+| 항목 | 버전 |
+|------|------|
+| Java | 21 이상 |
+| Spring Boot | 3.5.x |
+| Gradle | 8.x |
+| Database | MariaDB 11.x |
+| IDE | IntelliJ IDEA |
+
+</details>
+
+<details>
+<summary>⚙️ 2️⃣ 실행 방법 (Run Application)</summary>
+
+1. 프로젝트 클론  
+   ```bash
+   git clone https://github.com/be20-2nd-landmine-PINUP/PINUP-BE.git
+   cd PINUP-BE
+application.yml DB 설정 확인
+
+yaml
+코드 복사
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/pinup<br>
+    username: root<br>
+    password: 1234
+실행
+
+bash
+코드 복사
+./gradlew bootRun
+실행 확인
+
+scss
+코드 복사
+Tomcat started on port(s): 8080
+</details>
+
+<details> <summary>🧪 3️⃣ Swagger 테스트 방법</summary>
+
+접속: http://localhost:8080/swagger-ui/index.html
+
+</details>
+
+<details> <summary>🧾 4️⃣ 테스트 코드 실행</summary>
+./gradlew test
+
+
+테스트 결과 확인:
+build/reports/tests/test/index.html
+
+대표 테스트:
+
+클래스	설명
+StoreSwaggerTest	Swagger 문서 확인
+InventoryServiceTest	인벤토리 CRUD
+PointServiceTest	포인트 적립/차감
+
+</details>
+
+## 🧭 MSA 구조도
+
+<img width="890" height="287" alt="Image" src="https://github.com/user-attachments/assets/085d9a09-4db6-4742-b46a-b493b2948487" />
 
 ## 🧪 Postman / Swagger
 
 ![test](https://github.com/user-attachments/assets/8829c3fb-7844-45aa-b65e-a66becb3cdbb)
 
-## 🤝 기여 가이드 (Contribution Guide)
 
 ## 🚀 향후 발전 방향
 
