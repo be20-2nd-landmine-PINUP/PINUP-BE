@@ -34,7 +34,7 @@
         /* 사이드바 */
         .sidebar {
             width: 250px;
-            background: linear-gradient(180deg, #1A8CFF 0%, #1274D9 100%);
+            background: linear-gradient(180deg, #3AC45D 0%, #2FA84E 100%);
             color: #fff;
             padding: 28px 24px 32px;
             display: flex;
@@ -80,7 +80,7 @@
 
         .nav-item.active,
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.18);
             opacity: 1;
         }
 
@@ -146,8 +146,12 @@
 
         .stat-card h2 {
             font-size: 28px;
-            color: var(--primary);
+            color: var(--accent);
             font-weight: 800;
+        }
+
+        h3 {
+            margin-top : 0;
         }
 
         /* 표 섹션 */
@@ -155,7 +159,7 @@
             background: var(--card-bg);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-soft);
-            padding: 22px;
+            padding: 24px;
         }
 
         table {
@@ -205,8 +209,8 @@
             <a href="/admin/home" class="nav-item active"><span class="icon"></span>홈</a>
             <a href="/admin/notices" class="nav-item"><span class="icon"></span>공지사항</a>
             <a href="/admin/users" class="nav-item"><span class="icon"></span>회원 관리</a>
-            <a href="/admin/reports" class="nav-item"><span class="icon"></span>신고 내역</a>
-            <a href="/admin/settings" class="nav-item"><span class="icon"></span>설정</a>
+            <a href="#" class="nav-item"><span class="icon"></span>신고 내역</a>
+            <a href="#" class="nav-item"><span class="icon"></span>설정</a>
         </nav>
         <div class="sidebar-bottom">
             PIN-UP 관리자 페이지
@@ -216,7 +220,7 @@
     <!-- Main -->
     <main class="main">
         <div class="topbar">
-            <div class="topbar-title">관리자 대시보드 👩‍💻</div>
+            <div class="topbar-title">👩‍💻 관리자 대시보드</div>
             <button class="logout-btn" onclick="location.href='/logout'">로그아웃</button>
         </div>
 

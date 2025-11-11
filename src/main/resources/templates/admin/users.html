@@ -34,7 +34,7 @@
         /* 사이드바 */
         .sidebar {
             width: 250px;
-            background: linear-gradient(180deg, #1A8CFF 0%, #1274D9 100%);
+            background: linear-gradient(180deg, #3AC45D 0%, #2FA84E 100%);
             color: #fff;
             padding: 28px 24px 32px;
             display: flex;
@@ -80,7 +80,7 @@
 
         .nav-item.active,
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.18);
             opacity: 1;
         }
 
@@ -199,25 +199,11 @@
             backdrop-filter: blur(6px);
         }
 
-        .btn::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background: rgba(255,255,255,0.2);
-            transition: opacity 0.3s ease;
-            border-radius: inherit;
-        }
-
-        .btn:hover::before {
-            opacity: 1;
-        }
-
         .btn-all {
-            background: linear-gradient(135deg, #1A8CFF, #00C6FF);
+            background: linear-gradient(135deg, #3AC45D, #2FA84E);
         }
         .btn-all:hover {
-            background: linear-gradient(135deg, #0077e6, #00A8E6);
+            background: linear-gradient(135deg, #319C4A, #27823F);
         }
 
         .btn-suspended {
@@ -225,6 +211,27 @@
         }
         .btn-suspended:hover {
             background: linear-gradient(135deg, #E14C4C, #D87F17);
+        }
+
+        .manage-btn {
+            border: none;
+            border-radius: 999px; /* pill 형태 */
+            padding: 7px 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, #1A8CFF, #1274D9);
+            transition: all 0.2s ease;
+            margin: 2px;
+            letter-spacing: 0.3px;
+            min-width: 75px;
+        }
+
+        /* hover 시 살짝 어두워지게 */
+        .manage-btn:hover {
+            background: linear-gradient(135deg, #0F6DD0, #0D5BB3);
+            opacity: 0.95;
         }
 
         /* 반응형 */
@@ -251,8 +258,8 @@
             <a href="/admin/home" class="nav-item"><span class="icon"></span>홈</a>
             <a href="/admin/notices" class="nav-item"><span class="icon"></span>공지사항</a>
             <a href="/admin/users" class="nav-item active"><span class="icon"></span>회원 관리</a>
-            <a href="/admin/reports" class="nav-item"><span class="icon"></span>신고 내역</a>
-            <a href="/admin/settings" class="nav-item"><span class="icon"></span>설정</a>
+            <a href="#" class="nav-item"><span class="icon"></span>신고 내역</a>
+            <a href="#" class="nav-item"><span class="icon"></span>설정</a>
         </nav>
         <div class="sidebar-bottom">
             PIN-UP 관리자 페이지
