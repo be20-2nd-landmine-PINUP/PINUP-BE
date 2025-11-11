@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberResponse {
+    private Long userId;
     private String name;
     private String email;
     private String nickname;
@@ -25,6 +26,7 @@ public class MemberResponse {
 
     public static MemberResponse from(Users user) {
         return MemberResponse.builder()
+                .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
