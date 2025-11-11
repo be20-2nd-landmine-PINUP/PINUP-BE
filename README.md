@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/23382249/README.md)
+[README.md](https://github.com/user-attachments/files/23443549/README.md)
 <img width="800"  alt="pin-up_logo" src="https://github.com/user-attachments/assets/944556e2-658f-44eb-89f9-502f11709006" />
 
 ### 🧭 프로젝트 개요 (Overview)
@@ -55,9 +55,13 @@
 
 ## ✨ 주요 기능 (Features)
 ###  Auth (인증)
-- JWT 기반 로그인 및 회원 인증  
-- Access / Refresh Token 발급 및 검증  
-- 회원가입, 로그인, 로그아웃, 토큰 재발급 기능  
+사용자(User)<br>
+ - 소셜 로그인 (Google / Kakao / Naver OAuth2 기반)<br>
+ - 로그인 시 외부 플랫폼 인증을 통해 사용자 정보를 받아 등록 및 세션 관리
+
+관리자(Admin)<br>
+ - JWT 기반 로그인 및 인증<br>
+ - Access / Refresh Token 발급 및 검증
 
 ###  Config (환경설정)
 - 전역 설정 및 공통 예외 처리  
@@ -71,7 +75,7 @@
 ###  Feed (피드)
 - 유저별 여행 기록 피드 생성  
 - 게시글 작성 / 수정 / 삭제  
-- 사용자에게 유익한 피드에 대한 보상(좋아요 연계 포인트) 지급
+- 좋아요, 댓글 등 소셜 상호작용 기능  
 
 ###  Home (홈)
 - 서비스 메인 화면 구성  
@@ -120,16 +124,21 @@
 ### 요구사항명세서
 <img width="1392" height="721" alt="Image" src="https://github.com/user-attachments/assets/c61aa2b7-18f1-4e8a-91ac-4a8b60e1a296" />
 
+https://docs.google.com/spreadsheets/d/1Zkx9firrpHB_p1HVR-SOyMTRuEOYPh6jcCsCMcN00kU/edit?usp=sharing
 <br>
 
 ### DDD
 <img width="1040" height="871" alt="Image" src="https://github.com/user-attachments/assets/4001b209-5d7c-4f35-bdf0-a9cd8f80f20e" />
+
+https://miro.com/app/board/uXjVJ4yYm7Y=/?share_link_id=943594698314
 
 <br>
 
 ### ERD
 
 <img width="1151" height="636" alt="Image" src="https://github.com/user-attachments/assets/2410224e-c427-4046-9dce-74ab9bb9310a" />
+
+https://www.erdcloud.com/d/2rXFd73ekcpsxZJa9
 
 ## 🔗 API 구조 (API Overview)
 
@@ -165,9 +174,81 @@
 
 ## 🚀 실행 및 테스트 방법 (Run & Test)
 
+<details>
+<summary>🧩 1️⃣ 환경 요구사항 (Requirements)</summary>
+
+| 항목 | 버전 |
+|------|------|
+| Java | 21 이상 |
+| Spring Boot | 3.5.x |
+| Gradle | 8.x |
+| Database | MariaDB 11.x |
+| IDE | IntelliJ IDEA |
+
+</details>
+
+<details>
+<summary>⚙️ 2️⃣ 실행 방법 (Run Application)</summary>
+
+1. 프로젝트 클론  
+   ```bash
+   git clone https://github.com/be20-2nd-landmine-PINUP/PINUP-BE.git
+   cd PINUP-BE
+application.yml DB 설정 확인
+
+yaml
+코드 복사
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/pinup<br>
+    username: root<br>
+    password: 1234
+실행
+
+bash
+코드 복사
+./gradlew bootRun
+실행 확인
+
+scss
+코드 복사
+Tomcat started on port(s): 8080
+</details>
+
+<details> <summary>🧪 3️⃣ Swagger 테스트 방법</summary>
+
+접속: http://localhost:8080/swagger-ui/index.html
+
+</details>
+
+<details> <summary>🧾 4️⃣ 테스트 코드 실행</summary>
+./gradlew test
+
+
+테스트 결과 확인:
+build/reports/tests/test/index.html
+
+대표 테스트:
+
+클래스	설명
+StoreSwaggerTest	Swagger 문서 확인
+InventoryServiceTest	인벤토리 CRUD
+PointServiceTest	포인트 적립/차감
+
+</details>
+
+## 🧭 MSA 구조도
+
+<img width="890" height="287" alt="Image" src="https://github.com/user-attachments/assets/085d9a09-4db6-4742-b46a-b493b2948487" />
+
 ## 🧪 Postman / Swagger
 
 ![test](https://github.com/user-attachments/assets/8829c3fb-7844-45aa-b65e-a66becb3cdbb)
 
 
-## 🤝 기여 가이드 (Contribution Guide)
+## 🚀 향후 발전 방향
+
+- 팀 단위 영토 경쟁 모드
+- 국내 여행 활성화
+- 내수 지역 여행 활성
+- 지도 커스터마이징 (색상/뱃지/레벨 표시)
