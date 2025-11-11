@@ -207,7 +207,7 @@
         .profile-info-grid {
             margin-top: 8px;
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 4px 14px;
             font-size: 11px;
             color: var(--text-sub);
@@ -383,6 +383,93 @@
             }
         }
 
+        /* ✏️ 내 정보 수정 폼 스타일 */
+        #editForm {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 8px 28px rgba(26, 140, 255, 0.08);
+            padding: 24px 28px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .form-group input,
+        .form-group select {
+            border: 1.5px solid rgba(26, 140, 255, 0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            background: #f9fcff;
+            color: #333;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 140, 255, 0.15);
+            outline: none;
+            background: #fff;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            border: none;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #1A8CFF, #0099FF);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(26, 140, 255, 0.25);
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(135deg, #0079e6, #1A8CFF);
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn {
+            margin-left: 10px;
+            background: #E8F1FF;
+            color: var(--primary);
+            border: 1px solid rgba(26, 140, 255, 0.3);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(26, 140, 255, 0.08);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        a {
+            text-decoration: none; /* 밑줄 제거 */
+            color: inherit;        /* 부모 글자색 상속 */
+        }
+
     </style>
 </head>
 <body>
@@ -392,30 +479,12 @@
     <aside class="sidebar">
         <div class="logo">PIN-UP</div>
         <nav class="sidebar-nav">
-            <div class="nav-item">
-                <span class="icon"></span>
-                홈
-            </div>
-            <div class="nav-item active">
-                <span class="icon"></span>
-                마이페이지
-            </div>
-            <div class="nav-item">
-                <span class="icon"></span>
-                내 피드
-            </div>
-            <div class="nav-item">
-                <span class="icon"></span>
-                상점
-            </div>
-            <div class="nav-item">
-                <span class="icon"></span>
-                알림
-            </div>
-            <div class="nav-item">
-                <span class="icon"></span>
-                설정
-            </div>
+            <a href="/home" class="nav-item"><span class="icon"></span>홈</a>
+            <a href="/mypage" class="nav-item active"><span class="icon"></span>마이페이지</a>
+            <a href="#" class="nav-item"><span class="icon"></span>내 피드</a>
+            <a href="#" class="nav-item"><span class="icon"></span>상점</a>
+            <a href="#" class="nav-item"><span class="icon"></span>알림</a>
+            <a href="#" class="nav-item"><span class="icon"></span>설정</a>
         </nav>
         <div class="sidebar-bottom">
             국내 여행 땅따먹기 서비스 PIN-UP
@@ -451,20 +520,16 @@
                             <div><span th:text="${user.birthDate}"></span></div>
                         </div>
                         <div>
-                            <div class="profile-label">이메일</div>
-                            <div><span th:text="${user.email}"></span></div>
-                        </div>
-                        <div>
-                            <div class="profile-label">총 방문 지역</div>
-                            <div>23개 시·군·구</div>
-                        </div>
-                        <div>
                             <div class="profile-label">닉네임</div>
                             <div><span th:text="${user.nickname}"></span></div>
                         </div>
                         <div>
-                            <div class="profile-label">최근 여행</div>
-                            <div>부산 · 2025-10-29</div>
+                            <div class="profile-label">이메일</div>
+                            <div><span th:text="${user.email}"></span></div>
+                        </div>
+                        <div>
+                            <div class="profile-label">성별</div>
+                            <div><span th:text="${user.gender}"></span></div>
                         </div>
                         <div>
                             <div class="profile-label">상태</div>
@@ -475,11 +540,91 @@
                                 <span th:case="*">-</span>
                             </div>
                         </div>
+                        <div>
+                            <div class="profile-label">선호 카테고리</div>
+                            <div><span th:text="${user.preferredCategory}"></span></div>
+                        </div>
+                        <div>
+                            <div class="profile-label">선호 계절</div>
+                            <div><span th:text="${user.preferredSeason}"></span></div>
+                        </div>
                     </div>
                 </div>
-                <button class="edit-btn">
+                <!-- ✏️ 내 정보 수정 버튼 -->
+                <button class="edit-btn" id="editBtn">
                     <span class="icon">✏️</span> 내 정보 수정
                 </button>
+
+                <!-- 🧾 수정 폼 (기본 숨김 상태) -->
+                <form id="editForm" th:action="@{/member/update}" method="post" style="display:none; margin-top:16px;">
+                    <!-- ✅ 이메일은 hidden 처리 -->
+                    <input type="hidden" name="email" th:value="${user.email}" />
+
+                    <!-- 닉네임 -->
+                    <div class="form-group">
+                        <label>닉네임</label>
+                        <input type="text" name="nickname" th:value="${user.nickname}" required>
+                    </div>
+
+                    <!-- 성별 -->
+                    <div class="form-group">
+                        <label>성별</label>
+                        <select name="gender" required>
+                            <option th:value="'M'" th:selected="${user.gender == 'M'}">남성</option>
+                            <option th:value="'F'" th:selected="${user.gender == 'F'}">여성</option>
+                            <option th:value="'U'" th:selected="${user.gender == 'U'}">기타 / 미지정</option>
+                        </select>
+                    </div>
+
+                    <!-- 선호 카테고리 -->
+                    <div class="form-group">
+                        <label>선호 카테고리</label>
+                        <select name="preferredCategory" required>
+                            <option th:value="'자연'" th:selected="${user.preferredCategory == '자연'}">자연</option>
+                            <option th:value="'체험'" th:selected="${user.preferredCategory == '체험'}">체험</option>
+                            <option th:value="'역사'" th:selected="${user.preferredCategory == '역사'}">역사</option>
+                            <option th:value="'문화'" th:selected="${user.preferredCategory == '문화'}">문화</option>
+                        </select>
+                    </div>
+
+                    <!-- 선호 계절 -->
+                    <div class="form-group">
+                        <label>선호 계절</label>
+                        <select name="preferredSeason" required>
+                            <option th:value="'봄'" th:selected="${user.preferredSeason == '봄'}">봄</option>
+                            <option th:value="'여름'" th:selected="${user.preferredSeason == '여름'}">여름</option>
+                            <option th:value="'가을'" th:selected="${user.preferredSeason == '가을'}">가을</option>
+                            <option th:value="'겨울'" th:selected="${user.preferredSeason == '겨울'}">겨울</option>
+                        </select>
+                    </div>
+
+                    <!-- 생년월일 -->
+                    <div class="form-group">
+                        <label>생년월일</label>
+                        <input type="date" name="birthDate" th:value="${user.birthDate}">
+                    </div>
+
+                    <!-- 저장 / 취소 버튼 -->
+                    <div style="margin-top:12px;">
+                        <button type="submit" class="save-btn">저장</button>
+                        <button type="button" class="cancel-btn" id="cancelBtn">취소</button>
+                    </div>
+                </form>
+
+                <!-- 토글 JS -->
+                <script>
+                    const editBtn = document.getElementById('editBtn');
+                    const editForm = document.getElementById('editForm');
+                    const cancelBtn = document.getElementById('cancelBtn');
+
+                    editBtn.addEventListener('click', () => {
+                        editForm.style.display = (editForm.style.display === 'none') ? 'block' : 'none';
+                    });
+
+                    cancelBtn.addEventListener('click', () => {
+                        editForm.style.display = 'none';
+                    });
+                </script>
             </div>
 
             <!-- Points Card -->

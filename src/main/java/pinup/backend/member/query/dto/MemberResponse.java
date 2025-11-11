@@ -33,7 +33,7 @@ public class MemberResponse {
                 .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : "") // string으로 변환
                 .preferredCategory(user.getPreferredCategory().name())
                 .preferredSeason(user.getPreferredSeason().name())
-                .status(user.getStatus() != null ? user.getStatus().name() : "ACTIVE") // Enum → String 변환
+                .status(user.getStatus() != null ? user.getStatus().toString() : "") // Enum → String 변환
                 .build();
     }
 }
