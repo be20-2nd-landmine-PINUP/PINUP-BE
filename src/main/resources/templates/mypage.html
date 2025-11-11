@@ -2,147 +2,555 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>마이페이지 - PIN-UP</title>
+    <title>PIN-UP 마이페이지</title>
+    <!-- Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
+        :root {
+            --bg-light: #F5F5F5;
+            --primary: #1A8CFF;
+            --accent: #3AC45D;
+            --danger: #E53935;
+            --sidebar: #1A8CFF;
+            --card-bg: #FFFFFF;
+            --text-main: #121212;
+            --text-sub: #555555;
+            --radius-xl: 26px;
+            --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Pretendard', sans-serif;
-            background: linear-gradient(135deg, #a8edea, #fed6e3);
-            color: #333;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 전체 레이아웃 */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1A8CFF 0%, #1274D9 100%);
+            color: #fff;
+            padding: 28px 24px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 28px;
+            border-radius: 0 32px 32px 0;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: 0.06em;
+        }
+
+        .sidebar-nav {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            opacity: 0.9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item span.icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: inline-block;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.16);
+            opacity: 1;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            width: 100%;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* 메인 영역 */
+        .main {
+            flex: 1;
+            padding: 26px 32px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #ffffff;
+            border-radius: 999px;
+            box-shadow: 0 4px 12px rgba(33, 33, 80, 0.06);
+            min-width: 260px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .search-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 14px;
+            color: #fff;
         }
-        .mypage-container {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            padding: 40px;
-            width: 420px;
+
+        /* 카드 공통 */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            padding: 18px 22px;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
+
+        /* 첫 줄: 프로필 / 포인트 요약 */
+        .row {
+            display: grid;
+            grid-template-columns: 2.5fr 1.2fr;
+            gap: 18px;
         }
-        .profile {
-            margin: 20px auto;
-        }
-        .profile img {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-        }
-        .info p {
-            font-size: 16px;
-            margin: 8px 0;
-        }
-        .btn {
-            display: inline-block;
-            margin: 15px 10px 0;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
-            cursor: pointer;
-        }
-        .home-btn {
-            font-size: 13.3px;
-            background-color: #4CAF50;
-            color: white;
-        }
-        .home-btn:hover {
-            background-color: #388E3C;
-        }
-        .edit-btn {
-            background-color: #2196F3;
-            color: white;
-        }
-        .edit-btn:hover {
-            background-color: #1976D2;
-        }
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-        }
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-        .btn-container {
+
+        .profile-card {
             display: flex;
-            justify-content: center;
+            gap: 18px;
+            align-items: center;
         }
+
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+
+        .profile-info-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .profile-tag {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .profile-info-grid {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 4px 14px;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .profile-label {
+            font-weight: 600;
+            color: #9293b8;
+        }
+
+        .edit-btn {
+            margin-left: auto;
+            padding: 8px 14px;
+            font-size: 11px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(90, 53, 255, 0.08);
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-btn span.icon {
+            font-size: 12px;
+        }
+
+        .points-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: linear-gradient(145deg, #1A8CFF, #3AC45D);;
+            color: #fff;
+        }
+
+        .points-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .points-value {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .points-sub {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .points-actions {
+            margin-top: 4px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .points-pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        /* 두 번째 줄: 지도 + 통계/기록 */
+        .row-2 {
+            display: grid;
+            grid-template-columns: 2.3fr 1.2fr;
+            gap: 18px;
+        }
+
+        .map-card {
+            padding: 16px 16px 18px;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .map-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .map-filter {
+            font-size: 10px;
+            color: var(--primary);
+            background: rgba(90, 53, 255, 0.06);
+            padding: 5px 9px;
+            border-radius: 999px;
+        }
+
+        .map-container {
+            margin-top: 4px;
+            border-radius: 20px;
+            background: #e0e7ff;
+            height: 260px; /* 여기 div에 실제 지도 라이브러리 삽입하면 됨 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #7a7da1;
+        }
+
+        .stats-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stats-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stats-item {
+            padding: 8px 10px;
+            border-radius: 16px;
+            background: #f5f5ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .stats-item strong {
+            color: var(--text-main);
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 9px;
+            background: rgba(90, 53, 255, 0.12);
+            color: var(--primary);
+        }
+
+        /* 반응형 살짝 */
+        @media (max-width: 1080px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                flex-direction: row;
+                width: 100%;
+                border-radius: 0 0 32px 32px;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .main {
+                padding: 20px;
+            }
+            .row, .row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 <body>
-<div class="mypage-container">
-    <h1>내 정보</h1>
+<div class="layout">
 
-    <div class="profile">
-        <img th:src="${user.profileImage != null ? user.profileImage : '/images/default-profile.png'}" alt="프로필 사진">
-    </div>
-
-    <form action="/member/update" method="post" class="info">
-        <input type="hidden" name="email" th:value="${user.email}">
-
-        <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
-        <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
-
-        <p><strong>닉네임:</strong>
-            <input type="text" name="nickname" th:value="${user.nickname}" required>
-        </p>
-
-        <p>
-            <strong>생년월일:</strong>
-            <input type="date" name="birthDate" th:value="${user.birthDate}" />
-        </p>
-
-        <p>
-            <strong>성별:</strong>
-            <select name="gender">
-                <option th:each="g : ${genders}"
-                        th:value="${g}"
-                        th:text="${g}"
-                        th:selected="${g == user.gender}">
-                </option>
-            </select>
-        </p>
-
-        <p>
-            <strong>선호 카테고리:</strong>
-            <select name="preferredCategory">
-                <option th:each="c : ${categories}"
-                        th:value="${c}"
-                        th:text="${c}"
-                        th:selected="${c == user.preferredCategory}"></option>
-            </select>
-        </p>
-
-        <p>
-            <strong>선호 계절:</strong>
-            <select name="preferredSeason">
-                <option th:each="s : ${seasons}"
-                        th:value="${s}"
-                        th:text="${s}"
-                        th:selected="${s == user.preferredSeason}"></option>
-            </select>
-        </p>
-
-        <div class="btn-container">
-            <button type="submit" class="btn edit-btn">정보 수정</button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">PIN-UP</div>
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <span class="icon"></span>
+                홈
+            </div>
+            <div class="nav-item active">
+                <span class="icon"></span>
+                마이페이지
+            </div>
+            <div class="nav-item">
+                <span class="icon"></span>
+                내 피드
+            </div>
+            <div class="nav-item">
+                <span class="icon"></span>
+                상점
+            </div>
+            <div class="nav-item">
+                <span class="icon"></span>
+                알림
+            </div>
+            <div class="nav-item">
+                <span class="icon"></span>
+                설정
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            국내 여행 땅따먹기 서비스 PIN-UP
         </div>
-    </form>
+    </aside>
 
-    <div class="btn-container">
-        <form action="/member/delete" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
-            <button type="submit" class="btn delete-btn">회원 탈퇴</button>
-        </form>
+    <!-- Main -->
+    <main class="main">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-title">마이페이지</div>
+            <div class="search-box">
+                <input type="text" placeholder="내 여행 기록 검색하기" />
+                <div class="search-icon">🔍</div>
+            </div>
+        </div>
 
-        <a href="/" class="btn home-btn">홈으로</a>
-    </div>
+        <!-- 1행: 프로필 + 포인트 -->
+        <section class="row">
+            <!-- Profile Card -->
+            <div class="card profile-card">
+                <div class="profile-avatar">
+                    <!-- 유저 이름 머리글자 / 프로필 이미지로 교체 -->
+                    P
+                </div>
+                <div class="profile-info-main">
+                    <div class="profile-name"><span th:text="${user.name}"></span> 님</div>
+                    <div class="profile-tag">국내 여행자 · PIN-UP Explorer</div>
+
+                    <div class="profile-info-grid">
+                        <div>
+                            <div class="profile-label">생년월일</div>
+                            <div><span th:text="${user.birthDate}"></span></div>
+                        </div>
+                        <div>
+                            <div class="profile-label">이메일</div>
+                            <div><span th:text="${user.email}"></span></div>
+                        </div>
+                        <div>
+                            <div class="profile-label">총 방문 지역</div>
+                            <div>23개 시·군·구</div>
+                        </div>
+                        <div>
+                            <div class="profile-label">닉네임</div>
+                            <div><span th:text="${user.nickname}"></span></div>
+                        </div>
+                        <div>
+                            <div class="profile-label">최근 여행</div>
+                            <div>부산 · 2025-10-29</div>
+                        </div>
+                        <div>
+                            <div class="profile-label">상태</div>
+                            <div th:switch="${user.status}">
+                                <span th:case="'ACTIVE'">활성 회원</span>
+                                <span th:case="'SUSPENDED'">정지 회원</span>
+                                <span th:case="'DELETED'">탈퇴 회원</span>
+                                <span th:case="*">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="edit-btn">
+                    <span class="icon">✏️</span> 내 정보 수정
+                </button>
+            </div>
+
+            <!-- Points Card -->
+            <div class="card points-card">
+                <div class="points-title">나의 PIN-UP 포인트</div>
+                <div class="points-value">12,480 P</div>
+                <div class="points-sub">
+                    방문 인증, 피드 작성, 미션 완료 등으로 적립된 포인트입니다.
+                </div>
+                <div class="points-actions">
+                    <div class="points-pill">이번 달 적립: +1,320P</div>
+                    <div class="points-pill">다음 등급까지: 2,520P</div>
+                    <div class="points-pill">상점에서 아이템 교환하기</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2행: 지도 + 통계/기록 -->
+        <section class="row-2">
+            <!-- Map -->
+            <div class="card map-card">
+                <div class="map-header">
+                    <div class="map-title">내 영토 지도</div>
+                    <div class="map-filter">전체 / 시·군·구 / 동 단위 보기</div>
+                </div>
+                <div class="map-container" id="map">
+                    <!-- 실제 구현 시: Kakao Map / Leaflet / GeoJSON 렌더링 -->
+                    <div class="map-placeholder-text">
+                        여기 지도에 사용자가 점령한 지역(시·군·구·동)을 채워주세요.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats / History -->
+            <div class="card stats-card">
+                <div class="stats-title">여행 기록 & 랭킹</div>
+
+                <div class="stats-item">
+                    <div>
+                        <strong>이번 달 방문 지역</strong><br>
+                        부산, 전주, 속초 등 7개 지역
+                    </div>
+                    <span class="badge">+ 7 구역</span>
+                </div>
+
+                <div class="stats-item">
+                    <div>
+                        <strong>총 점령 구역</strong><br>
+                        시·군·구 기준 23/226개, 계속 도전해보세요!
+                    </div>
+                    <span class="badge">상위 12%</span>
+                </div>
+
+                <div class="stats-item">
+                    <div>
+                        <strong>최근 미션</strong><br>
+                        &lt;강릉 바다 인증샷&gt; 미션 완료
+                    </div>
+                    <span class="badge">+ 300P</span>
+                </div>
+
+                <div class="stats-item">
+                    <div>
+                        <strong>다음 추천</strong><br>
+                        아직 방문 안 한 전라 · 경상 내 인기 도시 추천
+                    </div>
+                    <span class="badge">추천 보기</span>
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
-
 </body>
 </html>

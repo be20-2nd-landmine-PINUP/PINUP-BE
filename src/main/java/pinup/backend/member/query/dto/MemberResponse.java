@@ -3,6 +3,7 @@ package pinup.backend.member.query.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import pinup.backend.member.command.domain.Users;
 
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class MemberResponse {
     private String name;
     private String email;
@@ -19,6 +21,7 @@ public class MemberResponse {
     private String birthDate;
     private String preferredCategory;
     private String preferredSeason;
+    private String status;
 
     public static MemberResponse from(Users user) {
         return MemberResponse.builder()
@@ -30,6 +33,7 @@ public class MemberResponse {
                 .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : "") // string으로 변환
                 .preferredCategory(user.getPreferredCategory().name())
                 .preferredSeason(user.getPreferredSeason().name())
+                .status(user.getStatus() != null ? user.getStatus().name() : "ACTIVE") // Enum → String 변환
                 .build();
     }
 }
