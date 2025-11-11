@@ -40,7 +40,8 @@
         /* 전체 레이아웃 */
         .layout {
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
         /* 사이드바 */
@@ -216,8 +217,8 @@
         }
 
         .profile-text p {
-            margin: 4px 0 0;
-            font-size: 14px;
+            margin: 10px 0 0;
+            font-size: 16px;
             color: var(--text-sub);
         }
 
@@ -238,12 +239,12 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1A8CFF, #0099FF);
+            background: linear-gradient(145deg, #1A8CFF, #3AC45D);
             color: white;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #0079e6, #1A8CFF);
+            background: linear-gradient(145deg, #1274D9, #2F9E4B);
         }
 
         .btn-danger {
@@ -257,6 +258,57 @@
 
         h3 {
             margin : 0 0 10px 0;
+        }
+
+        /* 🏆 월간 랭킹 카드 */
+        .ranking-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            padding: 20px 24px;
+        }
+
+        .ranking-card h3 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 14px;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: var(--text-sub);
+            text-align: center;
+        }
+
+        .ranking-table thead tr {
+            background: #f1f5ff;
+            color: var(--text-main);
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ranking-table tr:nth-child(even) {
+            background-color: #fafbff;
+        }
+
+        .ranking-table tr:hover {
+            background-color: #f2f7ff;
+            transition: background 0.2s ease;
+        }
+
+        .ranking-table td:first-child {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .ranking-table td:last-child {
+            font-weight: 600;
         }
 
         /* 대시보드 + 지도 */
@@ -386,7 +438,9 @@
                 </div>
                 <div class="profile-text">
                     <h2 th:text="'안녕하세요, ' + ${user['name']} + '님 👋'"></h2>
-                    <p th:text="'이메일: ' + ${user['email']}"></p>
+                    <p>🌏 정복한 지역 수:
+                        <span class="highlight" th:text="${user['conqueredCount'] != null ? user['conqueredCount'] : 0}"></span>
+                    </p>
                 </div>
             </div>
 
@@ -398,14 +452,35 @@
 
         <!-- 여행 대시보드 + 지도 -->
         <section class="dashboard-map">
-            <div class="dashboard">
-                <h3>🌏 여행 대시보드</h3>
-                <p class="stat">정복한 지역 수:
-                    <span class="highlight" th:text="${user['conqueredCount'] != null ? user['conqueredCount'] : 0}"></span>
-                </p>
-                <p class="stat">누적 포인트:
-                    <span class="highlight" th:text="${user['totalPoints'] != null ? user['totalPoints'] : 0}"></span>
-                </p>
+            <!-- 🏆 월간 랭킹 섹션 -->
+            <div class="ranking-card">
+                <h3>🏆 월간 랭킹</h3>
+                <table class="ranking-table">
+                    <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>닉네임</th>
+                        <th>포인트</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1위 🥇</td>
+                        <td>김지훈</td>
+                        <td>2,430P</td>
+                    </tr>
+                    <tr>
+                        <td>2위 🥈</td>
+                        <td>이예린</td>
+                        <td>2,210P</td>
+                    </tr>
+                    <tr>
+                        <td>3위 🥉</td>
+                        <td>박연수</td>
+                        <td>1,980P</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="map-card">
