@@ -9,7 +9,7 @@ import java.util.Date;
 
 public interface TerritoryVisitLogRepository extends JpaRepository<TerritoryVisitLog, Long> {
     /**
-     * 특정 지역(regionId)의 '기간 내' 유효 방문자(유저) 수 집계
+     * 특정 지역(regionId)의 '기간 내' 유효 방문자(유저) 수 집계 - point용
      * - v.territoryId  : Territory 엔티티
      * - t.userId       : Users 엔티티 (주의: 필드명이 userId 이지만 타입은 Users)
      * - t.userId.userId: Users의 PK(Long) 접근
