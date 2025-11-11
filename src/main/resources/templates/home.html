@@ -280,6 +280,7 @@
             font-size: 13px;
             color: var(--text-sub);
             text-align: center;
+            margin: 0 0 30px;
         }
 
         .ranking-table thead tr {
@@ -309,6 +310,50 @@
 
         .ranking-table td:last-child {
             font-weight: 600;
+        }
+
+        /* 📢 공지사항 카드 */
+        .notice-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            padding: 20px 24px;
+            margin-top: 20px;
+        }
+
+        .notice-card h3 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 14px;
+        }
+
+        .notice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .notice-table th,
+        .notice-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .notice-table th {
+            background-color: #f1f5ff;
+            color: var(--text-main);
+        }
+
+        .notice-table tr:hover {
+            background-color: #f8fbff;
+        }
+
+        .notice-table td:first-child {
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
         }
 
         /* 대시보드 + 지도 */
@@ -438,7 +483,7 @@
                 </div>
                 <div class="profile-text">
                     <h2 th:text="'안녕하세요, ' + ${user['name']} + '님 👋'"></h2>
-                    <p>🌏 정복한 지역 수:
+                    <p>🌏 정복한 지역 수 :
                         <span class="highlight" th:text="${user['conqueredCount'] != null ? user['conqueredCount'] : 0}"></span>
                     </p>
                 </div>
@@ -468,6 +513,20 @@
                     <tr>
                         <td colspan="5">데이터를 불러오는 중...</td>
                     </tr>
+                    </tbody>
+                </table>
+
+                <!-- 📢 공지사항 구역 -->
+                <h3>📢 공지사항</h3>
+                <table class="notice-table">
+                    <thead>
+                    <tr>
+                        <th>제목</th>
+                        <th>날짜</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td colspan="3">공지사항을 불러오는 중...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -591,6 +650,39 @@
                 tbody.innerHTML = `<tr><td colspan="3">데이터를 불러올 수 없습니다 ⚠️</td></tr>`;
             });
     });
+
+    // 공지사항 목록 불러오기
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/api/notices/latest?limit=3")
+            .then(res => {
+                if (!res.ok) throw new Error("공지사항 데이터를 불러올 수 없습니다.");
+                return res.json();
+            })
+            .then(data => {
+                const tbody = document.querySelector(".notice-table tbody");
+                tbody.innerHTML = "";
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2">등록된 공지사항이 없습니다.</td></tr>`;
+                    return;
+                }
+
+                data.forEach(notice => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                    <td onclick="location.href='/notice/${notice.id}'">${notice.title}</td>
+                    <td>${new Date(notice.createdAt).toLocaleDateString()}</td>
+                `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                const tbody = document.querySelector(".notice-table tbody");
+                tbody.innerHTML = `<tr><td colspan="2">데이터를 불러올 수 없습니다 ⚠️</td></tr>`;
+            });
+    });
+
 </script>
 </body>
 </html>
