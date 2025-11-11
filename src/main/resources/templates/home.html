@@ -70,6 +70,7 @@
         }
 
         .nav-item {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -100,6 +101,31 @@
             width: 100%;
             font-size: 12px;
             opacity: 0.7;
+        }
+
+        /* 숫자 뱃지 */
+        .notif-badge {
+            margin-left: 6px;
+            background: #ff4d4f;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 999px;
+            display: none; /* 처음엔 숨김 */
+            line-height: 1;
+        }
+
+        /* 새 알림이 들어오면 애니메이션 */
+        @keyframes notifPop {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .notif-badge.active {
+            display: inline-block;
+            animation: notifPop 0.4s ease;
         }
 
         /* 메인 */
@@ -291,7 +317,10 @@
             <a href="/mypage" class="nav-item"><span class="icon"></span>마이페이지</a>
             <a href="#" class="nav-item"><span class="icon"></span>내 피드</a>
             <a href="#" class="nav-item"><span class="icon"></span>상점</a>
-            <a href="#" class="nav-item"><span class="icon"></span>알림</a>
+            <a href="#" class="nav-item"><span class="icon"></span>
+                알림
+                <span class="notif-badge" id="notif-count">0</span>
+            </a>
             <a href="#" class="nav-item"><span class="icon"></span>설정</a>
         </nav>
         <div class="sidebar-bottom">
@@ -339,8 +368,8 @@
     </main>
 </div>
 
-<!-- Leaflet 지도 스크립트 -->
 <script>
+    <!-- Leaflet 지도 스크립트 -->
     var map = L.map('map', { center: [36.5, 127.9], zoom: 7 });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
         attribution: '© OpenStreetMap, © CartoDB', maxZoom: 18, opacity: 0.9
@@ -357,6 +386,34 @@
             }).addTo(map);
         })
         .catch(err => console.error("GeoJSON 로드 실패:", err));
+
+
+    <!-- 실시간 알림 SSE 연결 (로그인된 사용자 ID 사용) -->
+    const eventSource = new EventSource(`/sse/connect/1`);
+
+    eventSource.addEventListener("connect", (event) => {
+        console.log("✅ SSE 연결 성공:", event.data);
+    });
+
+    eventSource.addEventListener("new notification", (event) => {
+        const data = JSON.parse(event.data);
+        updateNotificationBadge();
+        console.log("📩 새 알림:", data.notificationMessage);
+    });
+
+    eventSource.onerror = (err) => {
+        console.error("🚨 SSE 연결 오류:", err);
+    };
+
+    // 숫자 증가 + 표시 함수
+    function updateNotificationBadge() {
+        const badge = document.getElementById("notif-count");
+        if (badge) {
+            let count = parseInt(badge.textContent) || 0;
+            badge.textContent = count + 1;
+            badge.classList.add("active");
+        }
+    }
 </script>
 </body>
 </html>
