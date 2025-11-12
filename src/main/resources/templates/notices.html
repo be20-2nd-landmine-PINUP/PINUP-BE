@@ -2,120 +2,265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>공지사항 목록 | PIN-UP Admin</title>
+    <title>공지사항 목록 | PIN-UP ADMIN</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
+        :root {
+            --bg-light: #F5F5F5;
+            --primary: #1A8CFF;
+            --accent: #3AC45D;
+            --danger: #E74C3C;
+            --card-bg: #FFFFFF;
+            --radius-xl: 26px;
+            --shadow-soft: 0 14px 40px rgba(0,0,0,0.08);
+            --text-main: #121212;
+            --text-sub: #555;
+        }
+
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Pretendard', sans-serif;
-            background: linear-gradient(135deg, #c3ec52, #0ba29d);
-            color: #333;
-            height: 100vh;
             margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-main);
+        }
+        a { text-decoration: none; color: inherit; }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #3AC45D 0%, #2FA84E 100%);
+            color: #fff;
+            padding: 28px 24px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 28px;
+            border-radius: 0 32px 32px 0;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: 0.06em;
+        }
+
+        .sidebar-nav {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            position: relative;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            opacity: 0.9;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .container {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            padding: 40px;
-            width: 900px;
+
+        .nav-item span.icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: inline-block;
         }
-        .logo {
-            width: 130px;
-            height: auto;
-            margin-bottom: 10px;
+
+        .nav-item.active,
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            opacity: 1;
         }
-        h1 {
-            font-size: 26px;
-            color: #222;
-            margin-bottom: 25px;
+
+        .sidebar-bottom {
+            margin-top: auto;
+            width: 100%;
+            font-size: 12px;
+            opacity: 0.7;
         }
+
+        /* 메인 */
+        .main {
+            flex: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+        .logout-btn:hover { background: #c0392b; }
+
+        /* 공지사항 카드 */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            padding: 24px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            border-radius: 12px;
-            overflow: hidden;
+            margin-top: 10px;
         }
+
         th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 14px;
             text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
         }
+
         th {
-            background-color: #f1f2f6;
-            color: #555;
+            background: #f1f5ff;
+            color: var(--text-sub);
+            font-weight: 600;
         }
-        tr:hover {
-            background-color: #f5f6fa;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
-            margin: 5px;
-        }
-        .create-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .create-btn:hover {
-            background-color: #388E3C;
-        }
-        .back-btn {
-            background-color: #0ba29d;
-            color: white;
-        }
-        .back-btn:hover {
-            background-color: #08857f;
-        }
+
+        tr:hover { background: #f9fbff; }
+
         .empty {
             color: #999;
             padding: 20px 0;
         }
+
+        /* 버튼 */
+        .btn {
+            display: inline-block;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #3AC45D, #2FA84E);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #319C4A, #27823F);
+        }
+
+        .btn-group {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        a.notice-link {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        a.notice-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1080px) {
+            .layout { flex-direction: column; }
+            .sidebar {
+                flex-direction: row;
+                width: 100%;
+                border-radius: 0 0 32px 32px;
+                justify-content: space-between;
+            }
+            .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <img th:src="@{/images/pinup_logo.png}" alt="PIN-UP 로고" class="logo">
-    <h1>📢 공지사항 목록</h1>
+<div class="layout">
 
-    <table>
-        <thead>
-        <tr>
-            <th>번호</th>
-            <th>제목</th>
-            <th>작성일</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="notice, stat : ${noticeList}">
-            <td th:text="${stat.count}">1</td>
-            <td>
-                <a th:href="@{'/admin/notice/' + ${notice.noticeId}}"
-                   th:text="${notice.noticeTitle}"
-                   style="color:#0ba29d; text-decoration:none; font-weight:500;">
-                    공지사항 제목
-                </a>
-            </td>
-            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2025-11-06</td>
-        </tr>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">PIN-UP ADMIN</div>
+        <nav class="sidebar-nav">
+            <a href="/admin/home" class="nav-item"><span class="icon"></span>홈</a>
+            <a href="/admin/notices" class="nav-item active"><span class="icon"></span>공지사항</a>
+            <a href="/admin/users" class="nav-item"><span class="icon"></span>회원 관리</a>
+            <a href="#" class="nav-item"><span class="icon"></span>신고 내역</a>
+            <a href="#" class="nav-item"><span class="icon"></span>설정</a>
+        </nav>
+        <div class="sidebar-bottom">
+            PIN-UP 관리자 페이지
+        </div>
+    </aside>
 
-        <tr th:if="${#lists.isEmpty(noticeList)}">
-            <td colspan="3" class="empty">등록된 공지사항이 없습니다.</td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- Main -->
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-title">📢 공지사항 목록</div>
+            <button class="logout-btn" onclick="location.href='/logout'">로그아웃</button>
+        </div>
 
-    <div style="margin-top: 30px;">
-        <a href="/admin/notice/create" class="btn create-btn">새 공지 등록</a>
-        <a href="/admin/home" class="btn back-btn">대시보드로 돌아가기</a>
-    </div>
+        <section class="table-card">
+            <table>
+                <div class="btn-group">
+                    <a href="/admin/notice/create" class="btn">새 공지 등록</a>
+                    <a href="/admin/home" class="btn">대시보드로 돌아가기</a>
+                </div>
+
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="notice, stat : ${noticeList}">
+                    <td th:text="${stat.count}">1</td>
+                    <td>
+                        <a th:href="@{'/admin/notice/' + ${notice.noticeId}}"
+                           th:text="${notice.noticeTitle}"
+                           class="notice-link">공지사항 제목</a>
+                    </td>
+                    <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2025-11-06</td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(noticeList)}">
+                    <td colspan="3" class="empty">등록된 공지사항이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
 </div>
 </body>
 </html>
