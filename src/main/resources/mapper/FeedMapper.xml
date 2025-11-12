@@ -15,8 +15,6 @@
             <if test="cursorId != null">
                 AND f.feed_id &lt; #{cursorId}
             </if>
-            <!-- 예: 신고/삭제 제외 규칙이 생기면 여기에 추가 -->
-            <!-- AND f.report_count = 0 -->
         </where>
     </sql>
 
